@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#1A1A1A"/>
+  <!-- M shape with arrow - simplified version of the logo -->
+  <path d="M5 23 L5 9 L11 18 L16 9 L21 18 L21 9" 
+    stroke="#34D399" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Arrow going up-right from right leg -->
+  <path d="M21 9 L27 9 M27 9 L24 6 M27 9 L24 12" 
+    stroke="#34D399" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
