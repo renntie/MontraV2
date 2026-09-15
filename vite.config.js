@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+﻿import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
@@ -11,9 +11,9 @@ export default defineConfig({
       devOptions: {
         enabled: true,
       },
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'montra-icon-192.png', 'montra-icon-512.png'],
       manifest: {
-        name:             'Montra — Personal Finance',
+        name:             'Montra - Personal Finance',
         short_name:       'Montra',
         description:      'Manajemen keuangan pribadi yang simpel dan elegan',
         theme_color:      '#121212',

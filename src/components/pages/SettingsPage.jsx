@@ -42,11 +42,14 @@ export const SettingsPage = () => {
   }
 
   const handleInstall = async () => {
-    if (!canInstall) return
-    setInstalling(true)
-    const accepted = await install()
-    setInstalling(false)
-    if (accepted) addToast('Montra berhasil diinstall!')
+    if (canInstall) {
+      setInstalling(true)
+      const accepted = await install()
+      setInstalling(false)
+      if (accepted) addToast('Montra berhasil diinstall!')
+    } else {
+      addToast('Ketuk menu titik tiga (⋮) di pojok atas browser, lalu pilih "Tambahkan ke Layar Utama" / "Install Aplikasi"', 'info')
+    }
   }
 
   return (
@@ -231,7 +234,6 @@ export const SettingsPage = () => {
                         icon={Download}
                         loading={installing}
                         onClick={handleInstall}
-                        disabled={!canInstall}
                       >
                         {canInstall ? 'Install Sekarang' : 'Gunakan Menu Browser untuk Install'}
                       </Button>
