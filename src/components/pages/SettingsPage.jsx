@@ -1,7 +1,8 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import {
   LogOut, Plus, Pencil, Trash2, Download, Shield, Bell,
   ChevronRight, Heart, ExternalLink, Smartphone, Sparkles,
+  ArrowLeft,
 } from 'lucide-react'
 import { Avatar } from '@/components/atoms/Avatar'
 import { Button } from '@/components/atoms/Button'
@@ -18,7 +19,7 @@ const SOCIABUZZ_URL = 'https://sociabuzz.com/lilramm'
 export const SettingsPage = () => {
   const { user, signOut }              = useAuthStore()
   const { categories, deleteCategory } = useCategoryStore()
-  const { addToast, openCategoryModal } = useUIStore()
+  const { addToast, openCategoryModal, setActiveRoute } = useUIStore()
   const { canInstall, install, installed } = useInstallPWA()
 
   const [tab,        setTab]        = useState('account')
@@ -45,13 +46,23 @@ export const SettingsPage = () => {
     setInstalling(true)
     const accepted = await install()
     setInstalling(false)
-    if (accepted) addToast('Montra berhasil diinstall! 🎉')
+    if (accepted) addToast('Montra berhasil diinstall!')
   }
 
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0">
-        <h1 className="text-xl font-extrabold text-text-primary mb-4">Pengaturan</h1>
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={() => setActiveRoute('dashboard')}
+            aria-label="Kembali"
+            className="lg:hidden h-9 w-9 rounded-2xl bg-bg-surface border border-border flex items-center justify-center text-text-muted hover:text-text-primary hover:scale-105 active:scale-95 transition-all duration-200"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <h1 className="text-xl font-extrabold text-text-primary">Pengaturan</h1>
+        </div>
+
         <div className="flex gap-1 p-1 bg-bg-elevated rounded-2xl">
           {[['account','Akun'],['categories','Kategori'],['app','Aplikasi']].map(([val, label]) => (
             <button key={val} onClick={() => setTab(val)}
@@ -69,7 +80,7 @@ export const SettingsPage = () => {
       <div className="flex-1 overflow-y-auto px-4 lg:px-6 pb-28 lg:pb-6 scrollbar-hide">
         <div key={tab} className="page-enter space-y-4">
 
-          {/* ── ACCOUNT ─────────────────────────── */}
+          {/* ACCOUNT */}
           {tab === 'account' && (
             <>
               <Card className="p-4">
@@ -120,7 +131,7 @@ export const SettingsPage = () => {
             </>
           )}
 
-          {/* ── CATEGORIES ──────────────────────── */}
+          {/* CATEGORIES */}
           {tab === 'categories' && (
             <>
               <div>
@@ -151,11 +162,13 @@ export const SettingsPage = () => {
                         </div>
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                           <button onClick={() => openCategoryModal(cat)}
+                            aria-label="Edit kategori"
                             className="p-1.5 rounded-xl text-text-muted hover:text-text-primary hover:bg-bg-overlay
                               transition-all duration-150 hover:scale-110">
                             <Pencil size={13} />
                           </button>
                           <button onClick={() => handleDeleteCategory(cat.id)}
+                            aria-label="Hapus kategori"
                             className="p-1.5 rounded-xl text-text-muted hover:text-accent-expense hover:bg-accent-expense/10
                               transition-all duration-150 hover:scale-110">
                             <Trash2 size={13} />
@@ -190,7 +203,7 @@ export const SettingsPage = () => {
             </>
           )}
 
-          {/* ── APP ─────────────────────────────── */}
+          {/* APP */}
           {tab === 'app' && (
             <>
               {/* Install PWA Banner */}
@@ -198,65 +211,54 @@ export const SettingsPage = () => {
                 ${installed
                   ? 'bg-accent-income/5 border-accent-income/20'
                   : 'bg-gradient-to-br from-accent-blue/10 to-accent-purple/10 border-accent-blue/25'}`}>
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-accent-blue/10
-                  -translate-y-8 translate-x-8 pointer-events-none" />
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0
-                      ${installed ? 'bg-accent-income/20' : 'bg-accent-blue/20'}`}>
-                      {installed
-                        ? <Smartphone size={22} className="text-accent-income" />
-                        : <Download size={22} className="text-accent-blue animate-float" />}
-                    </div>
-                    <div>
-                      <p className={`text-base font-extrabold ${installed ? 'text-accent-income' : 'text-text-primary'}`}>
-                        {installed ? 'Montra Sudah Terinstall ✓' : 'Install Montra'}
-                      </p>
-                      <p className="text-xs text-text-muted">
-                        {installed ? 'Berjalan sebagai native app' : 'Tambah ke layar utama perangkat'}
-                      </p>
-                    </div>
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0
+                    ${installed ? 'bg-accent-income/20 text-accent-income' : 'bg-accent-blue/20 text-accent-blue'}`}>
+                    <Smartphone size={22} />
                   </div>
-                  {!installed && (
-                    <ul className="space-y-1.5 mb-4 text-xs text-text-secondary">
-                      {['Akses lebih cepat dari home screen','Bisa digunakan tanpa buka browser','Notifikasi & offline support'].map((item) => (
-                        <li key={item} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-accent-blue flex-shrink-0" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {canInstall && !installed && (
-                    <Button onClick={handleInstall} loading={installing} icon={Download}
-                      className="w-full bg-accent-blue text-white hover:brightness-110 font-bold">
-                      {installing ? 'Menginstall...' : 'Install Sekarang'}
-                    </Button>
-                  )}
+                  <div className="flex-1">
+                    <p className="text-base font-bold text-text-primary mb-1">
+                      {installed ? 'Montra Sudah Terinstall' : 'Install Aplikasi Montra'}
+                    </p>
+                    <p className="text-xs text-text-muted leading-relaxed mb-3">
+                      {installed
+                        ? 'Aplikasi berjalan secara native di perangkat Anda, mendukung akses offline dan notifikasi.'
+                        : 'Install di HP atau desktop untuk pengalaman yang lebih cepat, ringan, dan bisa dibuka tanpa browser.'}
+                    </p>
+                    {!installed && (
+                      <Button
+                        size="sm"
+                        icon={Download}
+                        loading={installing}
+                        onClick={handleInstall}
+                        disabled={!canInstall}
+                      >
+                        {canInstall ? 'Install Sekarang' : 'Gunakan Menu Browser untuk Install'}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Sociabuzz Support Banner */}
-              <div className="relative overflow-hidden rounded-3xl p-5 border border-accent-sociabuzz/20
-                bg-gradient-to-br from-accent-sociabuzz/8 to-accent-purple/8
-                hover:border-accent-sociabuzz/35 hover:from-accent-sociabuzz/12 hover:to-accent-purple/12
-                transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-sociabuzz/15 group">
-                <div className="absolute top-0 right-0 w-28 h-28 rounded-full bg-accent-sociabuzz/10
+              {/* Support Developer */}
+              <div className="relative overflow-hidden rounded-3xl p-5 border border-accent-sociabuzz/25
+                bg-gradient-to-br from-accent-sociabuzz/8 via-bg-surface to-accent-purple/8 group">
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-accent-sociabuzz/10
                   -translate-y-6 translate-x-6 pointer-events-none" />
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 rounded-2xl sociabuzz-gradient flex items-center justify-center
                       flex-shrink-0 shadow-glow-sociabuzz/30
                       transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                    <Heart size={22} className="text-white" fill="currentColor" />
+                      <Heart size={22} className="text-white" fill="currentColor" />
                     </div>
                     <div>
                       <p className="text-base font-extrabold gradient-text-sociabuzz">Support Developer</p>
-                      <p className="text-xs text-text-muted">Bantu kami terus berkembang 🚀</p>
+                      <p className="text-xs text-text-muted">Bantu kami terus berkembang</p>
                     </div>
                   </div>
                   <p className="text-xs text-text-secondary leading-relaxed mb-4">
-                    Montra dibuat dengan ❤️ sebagai aplikasi gratis. Jika kamu merasa terbantu,
+                    Montra dibuat sebagai aplikasi gratis. Jika kamu merasa terbantu,
                     pertimbangkan untuk mentraktir kopi agar kami bisa terus menambah fitur baru.
                   </p>
                   <a

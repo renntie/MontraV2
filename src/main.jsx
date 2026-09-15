@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
@@ -9,7 +9,7 @@ try {
   registerSW({
     immediate:     true,
     onNeedRefresh() { console.log('[Montra PWA] Update tersedia') },
-    onOfflineReady() { console.log('[Montra PWA] Siap digunakan offline ✓') },
+    onOfflineReady() { console.log('[Montra PWA] Siap digunakan offline') },
   })
 } catch {
   // virtual:pwa-register only available in Vite build, silently skip in tests

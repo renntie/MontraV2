@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Plus, Download, X, ArrowLeftRight } from 'lucide-react'
+﻿import { useEffect, useState } from 'react'
+import { Plus, Download, X, ArrowLeftRight, Settings, TrendingUp, TrendingDown } from 'lucide-react'
 import { SearchBar } from '@/components/molecules/SearchBar'
 import { TransactionItem } from '@/components/molecules/TransactionItem'
 import { MonthPicker } from '@/components/molecules/MonthPicker'
@@ -24,7 +24,7 @@ export const TransactionsPage = () => {
     filters, setFilters, clearFilters,
   }                           = useTransactionStore()
   const { categories }        = useCategoryStore()
-  const { openTransactionModal, addToast } = useUIStore()
+  const { openTransactionModal, setActiveRoute, addToast } = useUIStore()
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export const TransactionsPage = () => {
   const handleExport = () => {
     if (!transactions.length) { addToast('Tidak ada data untuk diekspor', 'info'); return }
     exportTransactionsToCSV(transactions)
-    addToast('Data berhasil diekspor 📊')
+    addToast('Data berhasil diekspor')
   }
 
   const grouped = transactions.reduce((acc, tx) => {
@@ -57,17 +57,28 @@ export const TransactionsPage = () => {
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-extrabold text-text-primary">Transaksi</h1>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleExport}
+              aria-label="Export CSV"
               className="h-9 w-9 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center
-                text-text-muted hover:text-text-primary hover:bg-bg-overlay hover:scale-105
+                text-text-muted hover:text-text-primary hover:bg-bg-overlay hover:scale-105 active:scale-95
                 transition-all duration-200"
             >
               <Download size={15} />
             </button>
             <button
+              onClick={() => setActiveRoute('settings')}
+              aria-label="Pengaturan"
+              className="lg:hidden h-9 w-9 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center
+                text-text-muted hover:text-text-primary hover:bg-bg-overlay hover:scale-105 active:scale-95
+                transition-all duration-200"
+            >
+              <Settings size={15} />
+            </button>
+            <button
               onClick={() => openTransactionModal()}
+              aria-label="Tambah Transaksi"
               className="h-9 w-9 rounded-2xl bg-accent-income flex items-center justify-center
                 text-bg hover:brightness-110 hover:scale-105 active:scale-95
                 transition-all duration-200 shadow-glow-income/20 group"
@@ -88,10 +99,15 @@ export const TransactionsPage = () => {
               <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl
                 bg-accent-income/10 text-accent-income text-xs font-semibold
                 border border-accent-income/20">
-                {filters.type === 'income' ? '↑ Pemasukan' : '↓ Pengeluaran'}
+                {filters.type === 'income' ? (
+                  <span className="flex items-center gap-1"><TrendingUp size={12} /> Pemasukan</span>
+                ) : (
+                  <span className="flex items-center gap-1"><TrendingDown size={12} /> Pengeluaran</span>
+                )}
                 <button
                   onClick={() => setFilters({ type: null })}
                   className="hover:scale-110 transition-transform duration-150"
+                  aria-label="Hapus filter tipe"
                 >
                   <X size={11} />
                 </button>
@@ -105,6 +121,7 @@ export const TransactionsPage = () => {
                 <button
                   onClick={() => setFilters({ categoryId: null })}
                   className="hover:scale-110 transition-transform duration-150"
+                  aria-label="Hapus filter kategori"
                 >
                   <X size={11} />
                 </button>
@@ -175,16 +192,21 @@ export const TransactionsPage = () => {
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-2">Tipe</label>
             <div className="flex gap-2">
-              {[[null, 'Semua'], ['income', '↑ Pemasukan'], ['expense', '↓ Pengeluaran']].map(([val, label]) => (
+              {[
+                { val: null, label: 'Semua', icon: null },
+                { val: 'income', label: 'Pemasukan', icon: TrendingUp },
+                { val: 'expense', label: 'Pengeluaran', icon: TrendingDown },
+              ].map(({ val, label, icon: Icon }) => (
                 <button
                   key={String(val)}
                   onClick={() => setFilters({ type: val })}
-                  className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all duration-200
+                  className={`flex-1 py-2 rounded-xl text-xs font-semibold border flex items-center justify-center gap-1.5 transition-all duration-200
                     hover:scale-[1.02] active:scale-[0.98]
                     ${filters.type === val
                       ? 'border-accent-income bg-accent-income/10 text-accent-income'
                       : 'border-border text-text-muted hover:border-border-strong'}`}
                 >
+                  {Icon && <Icon size={13} />}
                   {label}
                 </button>
               ))}

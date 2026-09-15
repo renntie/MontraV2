@@ -1,6 +1,9 @@
-import { useEffect, useState, useCallback } from 'react'
-import { Plus, Pencil, Trash2, CheckCircle2, CreditCard, Target, BookMarked, TrendingDown } from 'lucide-react'
-import { format } from 'date-fns'
+﻿import { useEffect, useState, useCallback } from 'react'
+import * as Icons from 'lucide-react'
+import {
+  Plus, Pencil, Trash2, CheckCircle2, CreditCard, Target, BookMarked,
+  TrendingDown, ArrowDownLeft, Settings,
+} from 'lucide-react'
 import { Button } from '@/components/atoms/Button'
 import { ProgressBar } from '@/components/atoms/ProgressBar'
 import { EmptyState } from '@/components/atoms/EmptyState'
@@ -25,8 +28,8 @@ const TABS = [
 
 export const GoalsPage = () => {
   const { user }                            = useAuthStore()
-  const { addToast, openBudgetModal, openSavingsModal, openDebtModal } = useUIStore()
-  const { selectedMonth } = useTransactionStore()
+  const { addToast, openBudgetModal, openSavingsModal, openDebtModal, setActiveRoute } = useUIStore()
+  const { selectedMonth, setSelectedMonth } = useTransactionStore()
 
   const [tab,       setTab]      = useState('budget')
   const [savings,   setSavings]  = useState([])
@@ -80,7 +83,7 @@ export const GoalsPage = () => {
         paid_amount: newStatus === 'paid' ? debt.amount : debt.paid_amount,
       })
       setDebts((p) => p.map((d) => (d.id === debt.id ? updated : d)))
-      addToast(newStatus === 'paid' ? '✓ Ditandai lunas' : 'Ditandai belum lunas')
+      addToast(newStatus === 'paid' ? 'Ditandai lunas' : 'Ditandai belum lunas')
     } catch (err) { addToast(err.message, 'error') }
   }
 
@@ -102,13 +105,25 @@ export const GoalsPage = () => {
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-extrabold text-text-primary">Tujuan &amp; Hutang</h1>
-          <button
-            onClick={handleAdd}
-            className="h-9 w-9 rounded-2xl bg-accent-income flex items-center justify-center
-              text-bg hover:brightness-110 active:scale-95 transition-all duration-200 shadow-glow-income/30 group"
-          >
-            <Plus size={18} className="transition-transform duration-300 group-hover:rotate-90" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveRoute('settings')}
+              aria-label="Pengaturan"
+              className="lg:hidden h-9 w-9 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center
+                text-text-muted hover:text-text-primary hover:bg-bg-overlay hover:scale-105 active:scale-95
+                transition-all duration-200"
+            >
+              <Settings size={15} />
+            </button>
+            <button
+              onClick={handleAdd}
+              aria-label="Tambah item"
+              className="h-9 w-9 rounded-2xl bg-accent-income flex items-center justify-center
+                text-bg hover:brightness-110 active:scale-95 transition-all duration-200 shadow-glow-income/30 group"
+            >
+              <Plus size={18} className="transition-transform duration-300 group-hover:rotate-90" />
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -177,7 +192,7 @@ export const GoalsPage = () => {
   )
 }
 
-// ── Budget Tab ─────────────────────────────────────────────────────────────────
+// ── Budget Tab ────────────────────────────────────────────────────────────────
 const BudgetTabContent = ({ budgets, spentMap, onEdit, onDelete, onCreate }) => (
   <div className="space-y-3">
     {budgets.length === 0 ? (
@@ -204,74 +219,81 @@ const BudgetTabContent = ({ budgets, spentMap, onEdit, onDelete, onCreate }) => 
   </div>
 )
 
-// ── Savings Tab ────────────────────────────────────────────────────────────────
+// ── Savings Goal Icon Renderer ───────────────────────────────────────────────
+const GoalIcon = ({ name }) => {
+  const IconComponent = Icons[name] || Icons.PiggyBank
+  return (
+    <div className="w-10 h-10 rounded-2xl bg-accent-purple/15 flex items-center justify-center flex-shrink-0 text-accent-purple">
+      <IconComponent size={20} strokeWidth={1.8} />
+    </div>
+  )
+}
+
+// ── Savings Tab ───────────────────────────────────────────────────────────────
 const SavingsTabContent = ({ savings, onEdit, onDelete, onCreate }) => {
-  const total   = savings.reduce((s, g) => s + (g.target_amount  || 0), 0)
-  const current = savings.reduce((s, g) => s + (g.current_amount || 0), 0)
+  const totalTarget  = savings.reduce((s, g) => s + g.target_amount, 0)
+  const totalCurrent = savings.reduce((s, g) => s + g.current_amount, 0)
+  const overallPct   = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0
 
   return (
     <div className="space-y-3">
       {savings.length > 0 && (
-        <Card className="p-4 animate-fade-in">
-          <div className="flex justify-between mb-2">
-            <div>
-              <p className="text-xs text-text-muted">Total Terkumpul</p>
-              <p className="text-xl font-extrabold text-accent-income tabular-nums">
-                {formatCurrency(current, { compact: true })}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-text-muted">Total Target</p>
-              <p className="text-sm font-semibold text-text-secondary tabular-nums">
-                {formatCurrency(total, { compact: true })}
-              </p>
-            </div>
+        <Card className="p-4 bg-gradient-to-br from-accent-purple/10 to-accent-income/5 border-accent-purple/20">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-text-muted">Total Tabungan</span>
+            <span className="text-xs font-bold text-accent-purple">{overallPct.toFixed(0)}% terkumpul</span>
           </div>
-          <ProgressBar value={current} max={total} />
-          <p className="text-xs text-text-muted mt-1.5">
-            {total > 0 ? ((current / total) * 100).toFixed(1) : 0}% dari semua target
+          <p className="text-xl font-extrabold text-text-primary mb-2 tabular-nums">
+            {formatCurrency(totalCurrent)}
+            <span className="text-xs text-text-muted font-normal ml-1">/ {formatCurrency(totalTarget)}</span>
           </p>
+          <ProgressBar value={totalCurrent} max={totalTarget} color="#A78BFA" />
         </Card>
       )}
 
       {savings.length === 0 ? (
         <EmptyState icon={BookMarked} title="Belum ada target tabungan"
-          description="Buat target untuk mencapai impianmu"
-          action={<Button size="sm" icon={Plus} onClick={onCreate}>Tambah Target</Button>} />
+          description="Rencanakan target tabungan untuk impian finansialmu"
+          action={<Button size="sm" icon={Plus} onClick={onCreate}>Buat Target Tabungan</Button>} />
       ) : (
         <>
           {savings.map((goal, i) => {
-            const pct  = goal.target_amount > 0 ? Math.min((goal.current_amount / goal.target_amount) * 100, 100) : 0
-            const done = pct >= 100
+            const pct = goal.target_amount > 0
+              ? Math.min(100, (goal.current_amount / goal.target_amount) * 100) : 0
+            const done = goal.current_amount >= goal.target_amount
+
             return (
-              <Card key={goal.id} hover
-                className={`p-4 animate-fade-in-up ${done ? 'border-accent-income/30' : ''}`}
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <div className="flex items-start justify-between mb-3">
+              <Card key={goal.id} className="p-4 space-y-3 animate-fade-in-up"
+                style={{ animationDelay: `${i * 60}ms` }}>
+                <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-accent-purple/10 flex items-center justify-center
-                      text-xl flex-shrink-0 transition-transform duration-300 hover:scale-110">
-                      {goal.emoji || '💰'}
-                    </div>
+                    <GoalIcon name={goal.emoji} />
                     <div>
-                      <p className="text-sm font-semibold text-text-primary">{goal.name}</p>
+                      <p className="text-sm font-bold text-text-primary">{goal.name}</p>
                       <p className="text-xs text-text-muted">
-                        {done ? '🎉 Target tercapai!' : goal.deadline
-                          ? `Deadline: ${formatDate(goal.deadline)}`
-                          : 'Tanpa deadline'}
+                        {done ? (
+                          <span className="flex items-center gap-1 text-accent-income font-medium">
+                            <CheckCircle2 size={12} /> Target tercapai!
+                          </span>
+                        ) : goal.deadline ? `Target: ${formatDate(goal.deadline)}` : 'Tanpa deadline'}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => onEdit(goal)}
+                    <button
+                      onClick={() => onEdit(goal)}
+                      aria-label="Edit target"
                       className="p-1.5 rounded-xl hover:bg-bg-overlay text-text-muted hover:text-text-primary
-                        transition-all duration-150 hover:scale-110">
+                        transition-all duration-150 hover:scale-110"
+                    >
                       <Pencil size={13} />
                     </button>
-                    <button onClick={() => onDelete(goal.id)}
+                    <button
+                      onClick={() => onDelete(goal.id)}
+                      aria-label="Hapus target"
                       className="p-1.5 rounded-xl hover:bg-accent-expense/10 text-text-muted hover:text-accent-expense
-                        transition-all duration-150 hover:scale-110">
+                        transition-all duration-150 hover:scale-110"
+                    >
                       <Trash2 size={13} />
                     </button>
                   </div>
@@ -299,7 +321,7 @@ const SavingsTabContent = ({ savings, onEdit, onDelete, onCreate }) => {
   )
 }
 
-// ── Debt Tab ───────────────────────────────────────────────────────────────────
+// ── Debt Tab ──────────────────────────────────────────────────────────────────
 const DebtTabContent = ({ debts, onEdit, onDelete, onToggleSettle, onCreate }) => {
   const unpaid          = debts.filter((d) => d.status !== 'paid')
   const paid            = debts.filter((d) => d.status === 'paid')
@@ -312,13 +334,13 @@ const DebtTabContent = ({ debts, onEdit, onDelete, onToggleSettle, onCreate }) =
         <div className="grid grid-cols-2 gap-3">
           <Card className="p-3.5 border-accent-expense/20 hover:border-accent-expense/35 transition-colors duration-300">
             <p className="text-xs text-accent-expense font-semibold mb-1 flex items-center gap-1.5">
-              <TrendingDown size={11} /> Hutang
+              <TrendingDown size={12} /> Hutang
             </p>
             <p className="text-lg font-extrabold text-accent-expense tabular-nums">{formatCurrency(totalDebt, { compact: true })}</p>
           </Card>
           <Card className="p-3.5 border-accent-income/20 hover:border-accent-income/35 transition-colors duration-300">
             <p className="text-xs text-accent-income font-semibold mb-1 flex items-center gap-1.5">
-              <CheckCircle2 size={11} /> Piutang
+              <CheckCircle2 size={12} /> Piutang
             </p>
             <p className="text-lg font-extrabold text-accent-income tabular-nums">{formatCurrency(totalReceivable, { compact: true })}</p>
           </Card>
@@ -365,17 +387,17 @@ const DebtCard = ({ debt, onEdit, onDelete, onToggle }) => {
     <Card className={`p-4 transition-opacity duration-300 ${isPaid ? 'opacity-55' : ''}`}>
       <div className="flex items-start justify-between mb-2.5">
         <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-lg flex-shrink-0
+          <div className={`w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0
             transition-transform duration-200 hover:scale-110
-            ${isRec ? 'bg-accent-income/10' : 'bg-accent-expense/10'}`}>
-            {isRec ? '📥' : '💳'}
+            ${isRec ? 'bg-accent-income/10 text-accent-income' : 'bg-accent-expense/10 text-accent-expense'}`}>
+            {isRec ? <ArrowDownLeft size={18} strokeWidth={2} /> : <CreditCard size={18} strokeWidth={1.8} />}
           </div>
           <div>
             <p className="text-sm font-semibold text-text-primary">{debt.person_name}</p>
             <p className="text-xs text-text-muted">
               {isRec ? 'Piutang' : 'Hutang'}
               {debt.due_date ? ` · Jatuh tempo ${formatDate(debt.due_date)}` : ''}
-              {isPaid ? ' · ✓ Lunas' : ''}
+              {isPaid ? ' · Lunas' : ''}
             </p>
           </div>
         </div>
@@ -394,21 +416,29 @@ const DebtCard = ({ debt, onEdit, onDelete, onToggle }) => {
       )}
       {debt.note && <p className="text-xs text-text-muted italic mb-2.5">"{debt.note}"</p>}
       <div className="flex gap-2 pt-2.5 border-t border-border">
-        <button onClick={() => onToggle(debt)}
+        <button
+          onClick={() => onToggle(debt)}
           className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl
             transition-all duration-200 hover:scale-105
-            ${isPaid ? 'text-text-muted hover:bg-bg-elevated' : 'text-accent-income hover:bg-accent-income/10'}`}>
+            ${isPaid ? 'text-text-muted hover:bg-bg-elevated' : 'text-accent-income hover:bg-accent-income/10'}`}
+        >
           <CheckCircle2 size={12} />{isPaid ? 'Batal Lunas' : 'Lunas'}
         </button>
-        <button onClick={() => onEdit(debt)}
+        <button
+          onClick={() => onEdit(debt)}
+          aria-label="Edit catatan"
           className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl
-            text-text-muted hover:bg-bg-elevated transition-all duration-200 hover:scale-105">
+            text-text-muted hover:bg-bg-elevated transition-all duration-200 hover:scale-105"
+        >
           <Pencil size={12} />Edit
         </button>
-        <button onClick={() => onDelete(debt.id)}
+        <button
+          onClick={() => onDelete(debt.id)}
+          aria-label="Hapus catatan"
           className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl
             text-text-muted hover:text-accent-expense hover:bg-accent-expense/10
-            transition-all duration-200 hover:scale-105 ml-auto">
+            transition-all duration-200 hover:scale-105 ml-auto"
+        >
           <Trash2 size={12} />Hapus
         </button>
       </div>

@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+﻿import { useEffect } from 'react'
+import { Settings, Sparkles, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react'
 import { MonthlyBarChart } from '@/components/organisms/MonthlyBarChart'
 import { SpendingDonutChart } from '@/components/organisms/SpendingDonutChart'
 import { MonthPicker } from '@/components/molecules/MonthPicker'
@@ -7,10 +8,12 @@ import { Card } from '@/components/atoms/Card'
 import { Spinner } from '@/components/atoms/Spinner'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useAuthStore } from '@/store/authStore'
+import { useUIStore } from '@/store/uiStore'
 import { formatCurrency } from '@/utils/formatters'
 
 export const AnalyticsPage = () => {
   const { user } = useAuthStore()
+  const { setActiveRoute } = useUIStore()
   const {
     summary, categoryBreakdown, monthlyComparison, loading,
     selectedMonth, setSelectedMonth,
@@ -33,15 +36,26 @@ export const AnalyticsPage = () => {
     savingsRate >= 10 ? '#FBBF24' : '#FB7185'
 
   const rateLabel =
-    savingsRate >= 30 ? '🎉 Luar biasa!' :
-    savingsRate >= 10 ? '👍 Cukup baik'  :
-    savingsRate > 0   ? '⚠️ Perlu ditingkatkan' :
-    '📉 Pengeluaran melebihi pemasukan'
+    savingsRate >= 30 ? 'Luar biasa!' :
+    savingsRate >= 10 ? 'Cukup baik'  :
+    savingsRate > 0   ? 'Perlu ditingkatkan' :
+    'Pengeluaran melebihi pemasukan'
 
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0">
-        <h1 className="text-xl font-extrabold text-text-primary mb-4">Analitik</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-xl font-extrabold text-text-primary">Analitik</h1>
+          <button
+            onClick={() => setActiveRoute('settings')}
+            aria-label="Pengaturan"
+            className="lg:hidden h-9 w-9 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center
+              text-text-muted hover:text-text-primary hover:bg-bg-overlay hover:scale-105 active:scale-95
+              transition-all duration-200"
+          >
+            <Settings size={15} />
+          </button>
+        </div>
         <MonthPicker value={selectedMonth} onChange={setSelectedMonth} />
       </div>
 
@@ -67,14 +81,31 @@ export const AnalyticsPage = () => {
               >
                 {savingsRate.toFixed(1)}%
               </p>
-              <p className="text-xs text-text-muted mt-1.5">{rateLabel}</p>
+              <p className="text-xs text-text-muted mt-1.5 flex items-center gap-1.5">
+                {savingsRate >= 30 ? (
+                  <Sparkles size={13} style={{ color: rateColor }} />
+                ) : savingsRate >= 10 ? (
+                  <TrendingUp size={13} style={{ color: rateColor }} />
+                ) : savingsRate > 0 ? (
+                  <AlertCircle size={13} style={{ color: rateColor }} />
+                ) : (
+                  <TrendingDown size={13} style={{ color: rateColor }} />
+                )}
+                {rateLabel}
+              </p>
             </div>
             <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0
+              className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0
                 transition-transform duration-300 hover:scale-110"
               style={{ background: rateColor + '18' }}
             >
-              💰
+              {savingsRate >= 30 ? (
+                <Sparkles size={24} style={{ color: rateColor }} />
+              ) : savingsRate >= 10 ? (
+                <TrendingUp size={24} style={{ color: rateColor }} />
+              ) : (
+                <TrendingDown size={24} style={{ color: rateColor }} />
+              )}
             </div>
           </div>
 

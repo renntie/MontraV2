@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Sparkles } from 'lucide-react'
+﻿import { useState } from 'react'
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/atoms/Button'
 import { MontraLogo } from '@/components/atoms/MontraLogo'
 import { Input } from '@/components/atoms/Input'
@@ -24,7 +24,7 @@ export const AuthPage = () => {
       } else {
         if (!fullName.trim()) { setLocalError('Masukkan nama lengkap'); return }
         await signUpWithEmail(email, password, fullName)
-        setSuccess('Cek email Anda untuk konfirmasi akun ✓')
+        setSuccess('Cek email Anda untuk konfirmasi akun')
       }
     } catch (err) {
       setLocalError(err.message)
@@ -51,7 +51,7 @@ export const AuthPage = () => {
             <Sparkles size={14} className="absolute -top-1 -right-1 text-accent-yellow animate-float" />
           </div>
           <h1 className="text-2xl font-extrabold text-text-primary tracking-tight mt-3">Montra</h1>
-          <p className="text-sm text-text-muted mt-1">Kelola keuangan dengan cerdas 💰</p>
+          <p className="text-sm text-text-muted mt-1">Kelola keuangan dengan cerdas</p>
         </div>
 
         {/* Card */}
@@ -63,6 +63,7 @@ export const AuthPage = () => {
             {[['login', 'Masuk'], ['signup', 'Daftar']].map(([val, label]) => (
               <button
                 key={val}
+                type="button"
                 onClick={() => { setMode(val); setLocalError(''); setSuccess('') }}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-250 ${
                   mode === val
@@ -113,9 +114,11 @@ export const AuthPage = () => {
               autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               rightIcon={
                 <button
+                  type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="text-text-muted hover:text-text-primary transition-all duration-150 hover:scale-110"
                   tabIndex={-1}
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Lihat password'}
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -128,7 +131,7 @@ export const AuthPage = () => {
             <div className="flex items-start gap-2 text-xs text-accent-expense
               bg-accent-expense/8 border border-accent-expense/15 rounded-xl px-3 py-2.5
               animate-scale-in">
-              <span className="mt-0.5 flex-shrink-0">⚠️</span>
+              <AlertCircle size={14} className="mt-0.5 flex-shrink-0" />
               <span>{localError || error}</span>
             </div>
           )}
@@ -136,7 +139,7 @@ export const AuthPage = () => {
             <div className="flex items-start gap-2 text-xs text-accent-income
               bg-accent-income/8 border border-accent-income/15 rounded-xl px-3 py-2.5
               animate-scale-in">
-              <span className="mt-0.5 flex-shrink-0">✓</span>
+              <CheckCircle2 size={14} className="mt-0.5 flex-shrink-0" />
               <span>{success}</span>
             </div>
           )}
@@ -160,6 +163,7 @@ export const AuthPage = () => {
 
           {/* Google OAuth */}
           <button
+            type="button"
             onClick={signInWithGoogle}
             disabled={loading}
             className="w-full flex items-center justify-center gap-3 h-11

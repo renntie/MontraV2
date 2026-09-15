@@ -1,4 +1,4 @@
-import { Pencil, Trash2, AlertTriangle } from 'lucide-react'
+﻿import { Pencil, Trash2, AlertTriangle } from 'lucide-react'
 import { CategoryIcon } from '@/components/atoms/CategoryIcon'
 import { ProgressBar } from '@/components/atoms/ProgressBar'
 import { formatCurrency } from '@/utils/formatters'
@@ -32,8 +32,8 @@ export const BudgetProgress = ({ budget, spent = 0, onEdit, onDelete }) => {
             </span>
           )}
           {isWarning && (
-            <span className="text-[10px] font-bold text-accent-yellow bg-accent-yellow/10 px-2 py-0.5 rounded-lg">
-              ⚠ 80%+
+            <span className="flex items-center gap-1 text-[10px] font-bold text-accent-yellow bg-accent-yellow/10 px-2 py-0.5 rounded-lg">
+              <AlertTriangle size={10} /> 80%+
             </span>
           )}
         </div>

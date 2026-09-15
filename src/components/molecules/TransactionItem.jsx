@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { CategoryIcon } from '@/components/atoms/CategoryIcon'
 import { formatCurrency, formatRelativeDate } from '@/utils/formatters'
@@ -48,7 +48,7 @@ export const TransactionItem = ({ transaction, onEdit, onDelete }) => {
           group-hover:mr-1
           ${isIncome ? 'text-accent-income' : 'text-accent-expense'}
         `}>
-          {isIncome ? '+' : '−'}{formatCurrency(amount, { compact: true })}
+          {isIncome ? '+' : '-'}{formatCurrency(amount, { compact: true })}
         </span>
 
         <div className="flex gap-0.5 overflow-hidden max-w-0 group-hover:max-w-[64px] transition-all duration-200">

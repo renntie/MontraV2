@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Download, LogOut, RefreshCw, Heart, ExternalLink } from 'lucide-react'
+﻿import { useEffect, useState } from 'react'
+import { Download, LogOut, RefreshCw, Heart, ExternalLink, Settings, ArrowRight, ArrowLeftRight } from 'lucide-react'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import { SummaryCard } from '@/components/molecules/SummaryCard'
@@ -9,14 +9,12 @@ import { SpendingDonutChart } from '@/components/organisms/SpendingDonutChart'
 import { Card } from '@/components/atoms/Card'
 import { Spinner } from '@/components/atoms/Spinner'
 import { EmptyState } from '@/components/atoms/EmptyState'
-import { Avatar } from '@/components/atoms/Avatar'
 import { MontraLogo } from '@/components/atoms/MontraLogo'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
 import { exportTransactionsToCSV } from '@/utils/csvExport'
 import { formatCurrency } from '@/utils/formatters'
-import { ArrowLeftRight } from 'lucide-react'
 
 const SOCIABUZZ_URL = 'https://sociabuzz.com/lilramm'
 
@@ -29,8 +27,6 @@ export const DashboardPage = () => {
   const { openTransactionModal, setActiveRoute, addToast } = useUIStore()
   const [spinning, setSpinning] = useState(false)
 
-  const name = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
-
   useEffect(() => {
     if (user?.id) refreshAll(user.id)
   }, [user?.id, selectedMonth])
@@ -38,7 +34,7 @@ export const DashboardPage = () => {
   const handleExport = () => {
     if (!transactions.length) { addToast('Tidak ada data untuk diekspor', 'info'); return }
     exportTransactionsToCSV(transactions, `montra-${format(new Date(selectedMonth), 'yyyy-MM')}`)
-    addToast('Data berhasil diekspor ke CSV 📊')
+    addToast('Data berhasil diekspor ke CSV')
   }
 
   const handleRefresh = async () => {
@@ -51,30 +47,35 @@ export const DashboardPage = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* ── Mobile Header ─────────────────── */}
+      {/* Mobile Header */}
       <div className="lg:hidden flex items-center justify-between px-5 pt-5 pb-3">
         {/* Logo kiri */}
         <MontraLogo size="sm" />
         {/* Actions kanan */}
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {[
             { icon: RefreshCw, onClick: handleRefresh, spin: spinning, label: 'refresh' },
             { icon: Download,  onClick: handleExport,  spin: false,    label: 'export' },
+            { icon: Settings,  onClick: () => setActiveRoute('settings'), spin: false, label: 'settings' },
             { icon: LogOut,    onClick: signOut,       spin: false,    label: 'logout', danger: true },
           ].map(({ icon: Icon, onClick, spin, label, danger }) => (
-            <button key={label} onClick={onClick}
+            <button
+              key={label}
+              onClick={onClick}
+              aria-label={label}
               className={`h-9 w-9 rounded-2xl bg-bg-surface border border-border flex items-center justify-center
-                transition-all duration-200 hover:scale-105
+                transition-all duration-200 hover:scale-105 active:scale-95
                 ${danger
                   ? 'text-text-muted hover:text-accent-expense hover:bg-accent-expense/5'
-                  : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'}`}>
-              <Icon size={15} className={spin ? 'animate-spin' : ''} />
+                  : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'}`}
+            >
+              <Icon size={16} className={spin ? 'animate-spin' : ''} />
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── Desktop Header ─────────────────── */}
+      {/* Desktop Header */}
       <div className="hidden lg:flex items-center justify-between px-6 pt-6 pb-2">
         <div>
           <h1 className="text-2xl font-extrabold text-text-primary tracking-tight">Dashboard</h1>
@@ -83,22 +84,26 @@ export const DashboardPage = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={handleRefresh}
+          <button
+            onClick={handleRefresh}
             className="h-9 px-3 rounded-2xl bg-bg-elevated border border-border
               flex items-center gap-1.5 text-text-muted text-sm
-              hover:text-text-primary transition-all duration-200 hover:scale-105">
+              hover:text-text-primary transition-all duration-200 hover:scale-105"
+          >
             <RefreshCw size={14} className={spinning ? 'animate-spin' : ''} />
           </button>
-          <button onClick={handleExport}
+          <button
+            onClick={handleExport}
             className="flex items-center gap-2 h-9 px-4 rounded-2xl bg-bg-elevated border border-border
               text-text-secondary text-sm hover:text-text-primary
-              transition-all duration-200 hover:scale-105 hover:border-border-strong">
+              transition-all duration-200 hover:scale-105 hover:border-border-strong"
+          >
             <Download size={14} /> Export CSV
           </button>
         </div>
       </div>
 
-      {/* ── Body ─────────────────────────── */}
+      {/* Body */}
       <div className="flex-1 overflow-y-auto px-4 lg:px-6 pb-28 lg:pb-6 space-y-4 scrollbar-hide">
 
         {/* Month Picker */}
@@ -117,7 +122,7 @@ export const DashboardPage = () => {
           <p className={`text-3xl lg:text-4xl font-extrabold tracking-tight tabular-nums relative z-10
             transition-all duration-500
             ${balancePositive ? 'text-text-primary' : 'text-accent-expense text-glow-expense'}`}>
-            {!balancePositive && '−'}
+            {!balancePositive && '- '}
             {formatCurrency(Math.abs(summary.balance))}
           </p>
           <p className="text-xs text-text-muted mt-2 relative z-10">
@@ -166,10 +171,12 @@ export const DashboardPage = () => {
         <Card className="p-4 animate-fade-in-up" style={{ animationDelay: '280ms' }}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-text-primary">Transaksi Terkini</h2>
-            <button onClick={() => setActiveRoute('transactions')}
-              className="text-xs text-accent-income font-semibold hover:underline
-                transition-all duration-150 hover:text-accent-income/80">
-              Lihat semua →
+            <button
+              onClick={() => setActiveRoute('transactions')}
+              className="text-xs text-accent-income font-semibold hover:underline flex items-center gap-1
+                transition-all duration-150 hover:text-accent-income/80"
+            >
+              Lihat semua <ArrowRight size={13} />
             </button>
           </div>
           {loading ? (
@@ -188,7 +195,7 @@ export const DashboardPage = () => {
           )}
         </Card>
 
-        {/* Support Sociabuzz — Mobile Card */}
+        {/* Support Sociabuzz */}
         <a
           href={SOCIABUZZ_URL}
           target="_blank"
@@ -207,7 +214,7 @@ export const DashboardPage = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold gradient-text-sociabuzz">Support Developer</p>
-                <p className="text-xs text-text-muted">Traktir kopi di Sociabuzz ☕</p>
+                <p className="text-xs text-text-muted">Traktir kopi di Sociabuzz</p>
               </div>
               <ExternalLink size={14} className="text-accent-sociabuzz/50 flex-shrink-0" />
             </div>

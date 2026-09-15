@@ -1,13 +1,12 @@
-import { useState } from 'react'
-import { LayoutDashboard, ArrowLeftRight, BarChart3, BookMarked, Settings, Plus } from 'lucide-react'
+﻿import { useState } from 'react'
+import { LayoutDashboard, ArrowLeftRight, BarChart3, Target, Plus } from 'lucide-react'
 import { useUIStore } from '@/store/uiStore'
 
 const NAV_ITEMS = [
   { id: 'dashboard',    icon: LayoutDashboard, label: 'Beranda' },
   { id: 'transactions', icon: ArrowLeftRight,  label: 'Transaksi' },
   { id: 'analytics',   icon: BarChart3,        label: 'Analitik' },
-  { id: 'goals',       icon: BookMarked,       label: 'Tujuan' },
-  { id: 'settings',    icon: Settings,         label: 'Pengaturan' },
+  { id: 'goals',       icon: Target,           label: 'Tujuan' },
 ]
 
 export const BottomNav = () => {
@@ -22,33 +21,42 @@ export const BottomNav = () => {
 
   if (isModalOpen) return null
 
-  const leftItems  = NAV_ITEMS.slice(0, 2)
-  const rightItems = NAV_ITEMS.slice(2)
-
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden safe-bottom">
       <div className="glass border-t border-border px-1 pt-2 pb-1">
-        <div className="flex items-center justify-around relative">
-          {leftItems.map((item) => (
-            <NavBtn
-              key={item.id}
-              {...item}
-              isActive={activeRoute === item.id}
-              onClick={() => setActiveRoute(item.id)}
-            />
-          ))}
+        <div className="grid grid-cols-5 items-center justify-items-center w-full">
+          {/* Kolom 1: Beranda */}
+          <NavBtn
+            {...NAV_ITEMS[0]}
+            isActive={activeRoute === NAV_ITEMS[0].id}
+            onClick={() => setActiveRoute(NAV_ITEMS[0].id)}
+          />
 
-          {/* FAB */}
-          <FABButton onClick={openTransactionModal} />
+          {/* Kolom 2: Transaksi */}
+          <NavBtn
+            {...NAV_ITEMS[1]}
+            isActive={activeRoute === NAV_ITEMS[1].id}
+            onClick={() => setActiveRoute(NAV_ITEMS[1].id)}
+          />
 
-          {rightItems.map((item) => (
-            <NavBtn
-              key={item.id}
-              {...item}
-              isActive={activeRoute === item.id}
-              onClick={() => setActiveRoute(item.id)}
-            />
-          ))}
+          {/* Kolom 3: Exact Center FAB (+) */}
+          <div className="flex items-center justify-center w-full">
+            <FABButton onClick={openTransactionModal} />
+          </div>
+
+          {/* Kolom 4: Analitik */}
+          <NavBtn
+            {...NAV_ITEMS[2]}
+            isActive={activeRoute === NAV_ITEMS[2].id}
+            onClick={() => setActiveRoute(NAV_ITEMS[2].id)}
+          />
+
+          {/* Kolom 5: Tujuan */}
+          <NavBtn
+            {...NAV_ITEMS[3]}
+            isActive={activeRoute === NAV_ITEMS[3].id}
+            onClick={() => setActiveRoute(NAV_ITEMS[3].id)}
+          />
         </div>
       </div>
     </nav>
@@ -69,6 +77,7 @@ const FABButton = ({ onClick }) => {
         ${pressed ? 'scale-90' : 'scale-100'}
         active:scale-90
       `}
+      aria-label="Tambah Transaksi"
     >
       {/* Ripple ring */}
       <div className={`absolute inset-0 rounded-full border-2 border-accent-income/40
@@ -94,11 +103,11 @@ const NavBtn = ({ id, icon: Icon, label, isActive, onClick }) => {
   return (
     <button
       onClick={handleClick}
-      className="flex flex-col items-center gap-0.5 px-2.5 py-1 min-w-[52px] relative group"
+      className="flex flex-col items-center justify-center gap-0.5 py-1 w-full relative group"
     >
       {/* Active pill bg */}
       <div className={`
-        absolute top-0.5 left-1/2 -translate-x-1/2 h-8 w-10 rounded-2xl
+        absolute top-0.5 left-1/2 -translate-x-1/2 h-8 w-11 rounded-2xl
         transition-all duration-300 ease-smooth
         ${isActive ? 'bg-accent-income/12 scale-100' : 'bg-transparent scale-75'}
       `} />
@@ -113,8 +122,8 @@ const NavBtn = ({ id, icon: Icon, label, isActive, onClick }) => {
         strokeWidth={isActive ? 2.5 : 1.8}
       />
       <span className={`
-        text-[10px] font-medium relative z-10 transition-all duration-250
-        ${isActive ? 'text-accent-income' : 'text-text-muted'}
+        text-[11px] font-medium relative z-10 transition-all duration-250 truncate
+        ${isActive ? 'text-accent-income font-semibold' : 'text-text-muted'}
       `}>
         {label}
       </span>

@@ -1,20 +1,19 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import {
-  LayoutDashboard, ArrowLeftRight, BarChart3,
-  BookMarked, Settings, Plus, LogOut, ChevronRight,
-  Download, Heart,
+  LayoutDashboard, ArrowLeftRight, BarChart3, Target, Settings,
+  LogOut, Plus, Download, ChevronRight, Heart,
 } from 'lucide-react'
+import { MontraLogo } from '@/components/atoms/MontraLogo'
+import { Avatar } from '@/components/atoms/Avatar'
 import { useUIStore } from '@/store/uiStore'
 import { useAuthStore } from '@/store/authStore'
 import { useInstallPWA } from '@/hooks/useInstallPWA'
-import { Avatar } from '@/components/atoms/Avatar'
-import { MontraLogo } from '@/components/atoms/MontraLogo'
 
 const NAV_ITEMS = [
   { id: 'dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
   { id: 'transactions', icon: ArrowLeftRight,  label: 'Transaksi' },
   { id: 'analytics',   icon: BarChart3,        label: 'Analitik' },
-  { id: 'goals',       icon: BookMarked,       label: 'Tujuan & Hutang' },
+  { id: 'goals',       icon: Target,           label: 'Tujuan & Hutang' },
   { id: 'settings',    icon: Settings,         label: 'Pengaturan' },
 ]
 
@@ -39,12 +38,12 @@ export const Sidebar = () => {
   return (
     <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-bg-surface border-r border-border h-screen sticky top-0 flex-shrink-0 overflow-hidden">
 
-      {/* ── Logo ─────────────────────────────── */}
+      {/* Logo */}
       <div className="px-5 pt-6 pb-4 flex-shrink-0">
         <MontraLogo size="md" />
       </div>
 
-      {/* ── Add Transaction CTA ───────────────── */}
+      {/* Add Transaction CTA */}
       <div className="px-4 mb-3 flex-shrink-0">
         <button
           onClick={openTransactionModal}
@@ -58,7 +57,7 @@ export const Sidebar = () => {
         </button>
       </div>
 
-      {/* ── PWA Install Banner ───────────────── */}
+      {/* PWA Install Banner */}
       {(canInstall || !installed) && (
         <div className="mx-4 mb-3 flex-shrink-0">
           <button
@@ -79,7 +78,7 @@ export const Sidebar = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className={`text-xs font-bold leading-tight ${installed ? 'text-accent-income' : 'text-accent-blue'}`}>
-                {installed ? 'Sudah Terinstall ✓' : installing ? 'Menginstall...' : 'Install Montra'}
+                {installed ? 'Sudah Terinstall' : installing ? 'Menginstall...' : 'Install Montra'}
               </p>
               <p className="text-[10px] text-text-muted mt-0.5">
                 {installed ? 'Berjalan sebagai app' : 'Tambah ke layar utama'}
@@ -93,7 +92,7 @@ export const Sidebar = () => {
         </div>
       )}
 
-      {/* ── Nav Items ─────────────────────────── */}
+      {/* Nav Items */}
       <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto scrollbar-hide min-h-0">
         {NAV_ITEMS.map(({ id, icon: Icon, label }, idx) => {
           const isActive = activeRoute === id
@@ -129,7 +128,7 @@ export const Sidebar = () => {
         })}
       </nav>
 
-      {/* ── Support Sociabuzz ─────────────────── */}
+      {/* Support Sociabuzz */}
       <div className="px-4 pt-3 flex-shrink-0">
         <a
           href={SOCIABUZZ_URL}
@@ -148,7 +147,7 @@ export const Sidebar = () => {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold gradient-text-sociabuzz leading-tight">Support Developer</p>
-            <p className="text-[10px] text-text-muted mt-0.5">Sociabuzz · Traktir kopi ☕</p>
+            <p className="text-[10px] text-text-muted mt-0.5">Sociabuzz - Traktir kopi</p>
           </div>
           <ChevronRight size={12}
             className="text-accent-sociabuzz/50 flex-shrink-0
@@ -156,7 +155,7 @@ export const Sidebar = () => {
         </a>
       </div>
 
-      {/* ── User footer ───────────────────────── */}
+      {/* User footer */}
       <div className="px-4 pb-5 pt-3 border-t border-border flex-shrink-0 mt-1">
         <div className="flex items-center gap-3 mb-2.5">
           <Avatar name={name} />

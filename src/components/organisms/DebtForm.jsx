@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
+import { CreditCard, ArrowDownLeft, Info } from 'lucide-react'
 import { Input } from '@/components/atoms/Input'
 import { Button } from '@/components/atoms/Button'
 import { useAuthStore } from '@/store/authStore'
@@ -78,13 +79,14 @@ export const DebtForm = ({ debt = null, onClose, onSaved }) => {
       {/* Type Switcher */}
       <div className="flex gap-1.5 bg-bg-elevated rounded-2xl p-1">
         {[
-          ['payable',    '💳 Hutang Saya'],
-          ['receivable', '📥 Piutang Saya'],
-        ].map(([val, label]) => (
+          { val: 'payable', label: 'Hutang Saya', icon: CreditCard },
+          { val: 'receivable', label: 'Piutang Saya', icon: ArrowDownLeft },
+        ].map(({ val, label, icon: Icon }) => (
           <button
             key={val}
+            type="button"
             onClick={() => setType(val)}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
               type === val
                 ? val === 'receivable'
                   ? 'bg-accent-income text-bg shadow-sm'
@@ -92,16 +94,18 @@ export const DebtForm = ({ debt = null, onClose, onSaved }) => {
                 : 'text-text-muted hover:text-text-secondary'
             }`}
           >
+            <Icon size={14} />
             {label}
           </button>
         ))}
       </div>
 
       {/* Helper text */}
-      <p className="text-xs text-text-muted -mt-2 px-1">
+      <p className="text-xs text-text-muted -mt-2 px-1 flex items-center gap-1.5">
+        <Info size={13} className="text-text-muted flex-shrink-0" />
         {type === 'payable'
-          ? '💡 Hutang: kamu yang berutang kepada orang lain'
-          : '💡 Piutang: orang lain yang berutang kepadamu'}
+          ? 'Hutang: kamu yang berutang kepada orang lain'
+          : 'Piutang: orang lain yang berutang kepadamu'}
       </p>
 
       <Input
@@ -151,7 +155,7 @@ export const DebtForm = ({ debt = null, onClose, onSaved }) => {
         {Number(amount) > 0 && (
           <p className="mt-1 text-xs text-text-muted">
             Sisa: <span className={`font-semibold ${remaining > 0 ? 'text-accent-expense' : 'text-accent-income'}`}>
-              {remaining > 0 ? formatCurrency(remaining) : 'Lunas ✓'}
+              {remaining > 0 ? formatCurrency(remaining) : 'Lunas'}
             </span>
           </p>
         )}

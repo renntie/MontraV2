@@ -1,4 +1,5 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+﻿import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { PieChart as PieIcon } from 'lucide-react'
 import { formatCurrency } from '@/utils/formatters'
 
 const CustomTooltip = ({ active, payload }) => {
@@ -18,8 +19,8 @@ export const SpendingDonutChart = ({ data = [] }) => {
   if (!data.length) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-center">
-        <div className="w-14 h-14 rounded-3xl bg-bg-elevated flex items-center justify-center text-2xl mb-3">
-          📊
+        <div className="w-14 h-14 rounded-3xl bg-bg-elevated flex items-center justify-center text-text-muted mb-3">
+          <PieIcon size={26} strokeWidth={1.8} />
         </div>
         <p className="text-sm text-text-secondary font-medium">Belum ada pengeluaran</p>
         <p className="text-xs text-text-muted mt-1">Tambahkan transaksi untuk melihat analitik</p>
@@ -31,7 +32,7 @@ export const SpendingDonutChart = ({ data = [] }) => {
     <div className="flex flex-col gap-5">
       {/* Donut */}
       <div className="relative h-52">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
           <PieChart>
             <Pie
               data={data}

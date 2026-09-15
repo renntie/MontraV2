@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
+import * as Icons from 'lucide-react'
 import { Input } from '@/components/atoms/Input'
 import { Button } from '@/components/atoms/Button'
 import { useAuthStore } from '@/store/authStore'
@@ -6,15 +7,21 @@ import { useUIStore } from '@/store/uiStore'
 import { savingsService } from '@/services/savingsService'
 import { formatCurrency } from '@/utils/formatters'
 
-// Emoji picker list for savings goal icon
-const GOAL_EMOJIS = ['💰','🏠','🚗','✈️','💻','📱','🎮','🏖','🎓','💍','🏋️','📷','🎸','👶','🏥','🐶']
+// Transparent SVG Icon options for savings goals
+const GOAL_ICONS = [
+  'PiggyBank', 'Home', 'Car', 'Plane',
+  'Laptop', 'Smartphone', 'Gamepad2', 'Palmtree',
+  'GraduationCap', 'Gem', 'Dumbbell', 'Camera',
+  'Music', 'Baby', 'HeartPulse', 'Dog',
+  'Gift', 'ShoppingBag', 'Coffee', 'Briefcase'
+]
 
 export const SavingsForm = ({ saving = null, onClose, onSaved }) => {
   const { user }     = useAuthStore()
   const { addToast } = useUIStore()
 
   const [name,          setName]          = useState(saving?.name          || '')
-  const [emoji,         setEmoji]         = useState(saving?.emoji         || '💰')
+  const [iconName,      setIconName]      = useState(saving?.emoji         || 'PiggyBank')
   const [targetAmount,  setTargetAmount]  = useState(saving?.target_amount?.toString()  || '')
   const [currentAmount, setCurrentAmount] = useState(saving?.current_amount?.toString() || '0')
   const [deadline,      setDeadline]      = useState(saving?.deadline      || '')
@@ -24,7 +31,7 @@ export const SavingsForm = ({ saving = null, onClose, onSaved }) => {
   useEffect(() => {
     if (saving) {
       setName(saving.name || '')
-      setEmoji(saving.emoji || '💰')
+      setIconName(saving.emoji || 'PiggyBank')
       setTargetAmount(saving.target_amount?.toString() || '')
       setCurrentAmount(saving.current_amount?.toString() || '0')
       setDeadline(saving.deadline || '')
@@ -33,7 +40,7 @@ export const SavingsForm = ({ saving = null, onClose, onSaved }) => {
 
   const validate = () => {
     const e = {}
-    if (!name.trim())                                              e.name = 'Nama target tidak boleh kosong'
+    if (!name.trim()) e.name = 'Nama target tidak boleh kosong'
     if (!targetAmount || isNaN(Number(targetAmount)) || Number(targetAmount) <= 0)
       e.target = 'Masukkan jumlah target yang valid'
     setErrors(e)
@@ -47,7 +54,7 @@ export const SavingsForm = ({ saving = null, onClose, onSaved }) => {
       const payload = {
         user_id:        user.id,
         name:           name.trim(),
-        emoji,
+        emoji:          iconName,
         target_amount:  Number(targetAmount),
         current_amount: Math.max(0, Number(currentAmount) || 0),
         deadline:       deadline || null,
@@ -57,7 +64,7 @@ export const SavingsForm = ({ saving = null, onClose, onSaved }) => {
         addToast('Target tabungan diperbarui')
       } else {
         await savingsService.create(payload)
-        addToast('Target tabungan berhasil dibuat 🎯')
+        addToast('Target tabungan berhasil dibuat')
       }
       onSaved?.()
       onClose()
@@ -72,23 +79,29 @@ export const SavingsForm = ({ saving = null, onClose, onSaved }) => {
 
   return (
     <div className="p-5 space-y-4 pb-6">
-      {/* Emoji Picker */}
+      {/* Icon Picker */}
       <div>
-        <label className="block text-xs font-semibold text-text-secondary mb-2">Ikon Goal</label>
-        <div className="flex gap-2 flex-wrap">
-          {GOAL_EMOJIS.map((e) => (
-            <button
-              key={e}
-              onClick={() => setEmoji(e)}
-              className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xl transition-all ${
-                emoji === e
-                  ? 'bg-accent-income/15 ring-2 ring-accent-income/40 scale-110'
-                  : 'bg-bg-elevated hover:bg-bg-overlay'
-              }`}
-            >
-              {e}
-            </button>
-          ))}
+        <label className="block text-xs font-semibold text-text-secondary mb-2">Pilih Ikon Target</label>
+        <div className="flex gap-2 flex-wrap max-h-36 overflow-y-auto p-1 scrollbar-hide">
+          {GOAL_ICONS.map((iconKey) => {
+            const IconComponent = Icons[iconKey] || Icons.PiggyBank
+            const isSelected = iconName === iconKey
+            return (
+              <button
+                key={iconKey}
+                type="button"
+                onClick={() => setIconName(iconKey)}
+                className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${
+                  isSelected
+                    ? 'bg-accent-income/20 text-accent-income ring-2 ring-accent-income/50 scale-110'
+                    : 'bg-bg-elevated text-text-muted hover:text-text-primary hover:bg-bg-overlay'
+                }`}
+                aria-label={iconKey}
+              >
+                <IconComponent size={20} strokeWidth={1.8} />
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -152,7 +165,7 @@ export const SavingsForm = ({ saving = null, onClose, onSaved }) => {
         type="date"
         value={deadline}
         onChange={(e) => setDeadline(e.target.value)}
-        hint="Opsional — bantu kamu tetap termotivasi"
+        hint="Opsional - bantu kamu tetap termotivasi"
       />
 
       {/* Sticky Action Footer */}
