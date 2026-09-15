@@ -15,6 +15,18 @@ export const useUIStore = create(
       isCategoryModalOpen: false,
       editingCategory: null,
 
+      // Budget modal
+      isBudgetModalOpen: false,
+      editingBudget: null,
+
+      // Savings modal
+      isSavingsModalOpen: false,
+      editingSaving: null,
+
+      // Debt modal
+      isDebtModalOpen: false,
+      editingDebt: null,
+
       // Toast notifications
       toasts: [],
 
@@ -32,6 +44,24 @@ export const useUIStore = create(
         set({ isCategoryModalOpen: true, editingCategory: cat }),
       closeCategoryModal: () =>
         set({ isCategoryModalOpen: false, editingCategory: null }),
+
+      // Budget modal actions
+      openBudgetModal: (b = null) =>
+        set({ isBudgetModalOpen: true, editingBudget: b }),
+      closeBudgetModal: () =>
+        set({ isBudgetModalOpen: false, editingBudget: null }),
+
+      // Savings modal actions
+      openSavingsModal: (s = null) =>
+        set({ isSavingsModalOpen: true, editingSaving: s }),
+      closeSavingsModal: () =>
+        set({ isSavingsModalOpen: false, editingSaving: null }),
+
+      // Debt modal actions
+      openDebtModal: (d = null) =>
+        set({ isDebtModalOpen: true, editingDebt: d }),
+      closeDebtModal: () =>
+        set({ isDebtModalOpen: false, editingDebt: null }),
 
       // Toast actions
       addToast: (message, type = 'success') => {

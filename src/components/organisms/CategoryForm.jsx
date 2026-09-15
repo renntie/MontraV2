@@ -97,15 +97,17 @@ export const CategoryForm = ({ category = null, onClose }) => {
       {/* Color Picker */}
       <div>
         <label className="block text-xs font-semibold text-text-secondary mb-2">Warna</label>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2.5 flex-wrap">
           {DEFAULT_CATEGORY_COLORS.map((c) => (
             <button
               key={c}
+              type="button"
               onClick={() => setColor(c)}
-              className={`w-8 h-8 rounded-full transition-transform flex-shrink-0 ${
-                color === c ? 'scale-110 ring-2 ring-white/30 ring-offset-2 ring-offset-bg-surface' : 'hover:scale-105'
+              className={`w-8 h-8 rounded-full transition-all flex-shrink-0 ${
+                color === c ? 'scale-110 ring-2 ring-white/60 ring-offset-2 ring-offset-bg-surface shadow-md' : 'hover:scale-105 opacity-80 hover:opacity-100'
               }`}
               style={{ background: c }}
+              aria-label={`Warna ${c}`}
             />
           ))}
         </div>
@@ -114,25 +116,26 @@ export const CategoryForm = ({ category = null, onClose }) => {
       {/* Icon Picker */}
       <div>
         <label className="block text-xs font-semibold text-text-secondary mb-2">Ikon</label>
-        <div className="grid grid-cols-6 gap-2 max-h-44 overflow-y-auto scrollbar-hide pr-1">
+        <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 p-2 bg-bg-elevated/40 rounded-2xl border border-border/60">
           {ICON_LIST.map(({ key, icon: iconName }) => (
             <button
               key={key}
+              type="button"
               onClick={() => setIcon(iconName)}
               className={`aspect-square flex items-center justify-center rounded-xl border transition-all ${
                 icon === iconName
-                  ? 'border-accent-income/50 bg-accent-income/5'
-                  : 'border-transparent hover:bg-bg-elevated'
+                  ? 'border-accent-income bg-accent-income/15 scale-105 shadow-sm'
+                  : 'border-transparent hover:bg-bg-overlay/80'
               }`}
             >
-              <CategoryIcon iconName={iconName} color={color} size={15} className="!w-8 !h-8" />
+              <CategoryIcon iconName={iconName} color={color} size={16} className="!w-8 !h-8" />
             </button>
           ))}
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-3 pt-1 pb-2">
+      {/* Sticky Action Footer */}
+      <div className="sticky bottom-0 -mx-5 -mb-5 p-4 bg-bg-surface/95 backdrop-blur-md border-t border-border flex gap-3 z-20">
         <Button variant="secondary" onClick={onClose} className="flex-1">Batal</Button>
         <Button onClick={handleSubmit} loading={loading} className="flex-1">
           {category?.id ? 'Simpan Perubahan' : 'Buat Kategori'}

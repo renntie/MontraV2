@@ -173,8 +173,8 @@ export const DebtForm = ({ debt = null, onClose, onSaved }) => {
         hint="Opsional"
       />
 
-      {/* Actions */}
-      <div className="flex gap-3 pt-1">
+      {/* Sticky Action Footer */}
+      <div className="sticky bottom-0 -mx-5 -mb-6 p-4 bg-bg-surface/95 backdrop-blur-md border-t border-border flex gap-3 z-20 mt-4">
         <Button variant="secondary" onClick={onClose} className="flex-1">Batal</Button>
         <Button onClick={handleSubmit} loading={loading} className="flex-1">
           {debt?.id ? 'Simpan' : 'Tambah Catatan'}

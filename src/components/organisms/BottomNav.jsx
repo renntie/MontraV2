@@ -11,7 +11,17 @@ const NAV_ITEMS = [
 ]
 
 export const BottomNav = () => {
-  const { activeRoute, setActiveRoute, openTransactionModal } = useUIStore()
+  const {
+    activeRoute, setActiveRoute, openTransactionModal,
+    isTransactionModalOpen, isCategoryModalOpen, isBudgetModalOpen, isSavingsModalOpen, isDebtModalOpen,
+  } = useUIStore()
+
+  const isModalOpen = Boolean(
+    isTransactionModalOpen || isCategoryModalOpen || isBudgetModalOpen || isSavingsModalOpen || isDebtModalOpen
+  )
+
+  if (isModalOpen) return null
+
   const leftItems  = NAV_ITEMS.slice(0, 2)
   const rightItems = NAV_ITEMS.slice(2)
 

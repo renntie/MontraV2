@@ -8,8 +8,6 @@ import { Button } from '@/components/atoms/Button'
 import { Card } from '@/components/atoms/Card'
 import { CategoryIcon } from '@/components/atoms/CategoryIcon'
 import { MontraLogo } from '@/components/atoms/MontraLogo'
-import { BottomSheet } from '@/components/molecules/BottomSheet'
-import { CategoryForm } from '@/components/organisms/CategoryForm'
 import { useAuthStore } from '@/store/authStore'
 import { useCategoryStore } from '@/store/categoryStore'
 import { useUIStore } from '@/store/uiStore'
@@ -20,13 +18,11 @@ const SOCIABUZZ_URL = 'https://sociabuzz.com/lilramm'
 export const SettingsPage = () => {
   const { user, signOut }              = useAuthStore()
   const { categories, deleteCategory } = useCategoryStore()
-  const { addToast }                   = useUIStore()
+  const { addToast, openCategoryModal } = useUIStore()
   const { canInstall, install, installed } = useInstallPWA()
 
-  const [tab,               setTab]               = useState('account')
-  const [editingCategory,   setEditingCategory]   = useState(null)
-  const [categorySheetOpen, setCategorySheetOpen] = useState(false)
-  const [installing,        setInstalling]        = useState(false)
+  const [tab,        setTab]        = useState('account')
+  const [installing, setInstalling] = useState(false)
 
   const name        = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Pengguna'
   const email       = user?.email || ''
@@ -130,7 +126,7 @@ export const SettingsPage = () => {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-bold text-text-muted uppercase tracking-wider">Kustom ({customCats.length})</p>
-                  <button onClick={() => { setEditingCategory(null); setCategorySheetOpen(true) }}
+                  <button onClick={() => openCategoryModal(null)}
                     className="flex items-center gap-1 text-xs font-bold text-accent-income hover:underline">
                     <Plus size={12} /> Tambah
                   </button>
@@ -139,7 +135,7 @@ export const SettingsPage = () => {
                   <Card className="p-6 text-center">
                     <p className="text-sm text-text-muted mb-3">Belum ada kategori kustom</p>
                     <Button size="sm" variant="secondary" icon={Plus}
-                      onClick={() => { setEditingCategory(null); setCategorySheetOpen(true) }}>
+                      onClick={() => openCategoryModal(null)}>
                       Buat Kategori
                     </Button>
                   </Card>
@@ -154,7 +150,7 @@ export const SettingsPage = () => {
                           <p className="text-xs text-text-muted">{cat.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</p>
                         </div>
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                          <button onClick={() => { setEditingCategory(cat); setCategorySheetOpen(true) }}
+                          <button onClick={() => openCategoryModal(cat)}
                             className="p-1.5 rounded-xl text-text-muted hover:text-text-primary hover:bg-bg-overlay
                               transition-all duration-150 hover:scale-110">
                             <Pencil size={13} />
@@ -252,7 +248,7 @@ export const SettingsPage = () => {
                     <div className="w-12 h-12 rounded-2xl sociabuzz-gradient flex items-center justify-center
                       flex-shrink-0 shadow-glow-sociabuzz/30
                       transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                      <Heart size={22} className="text-white" fill="currentColor" />
+                    <Heart size={22} className="text-white" fill="currentColor" />
                     </div>
                     <div>
                       <p className="text-base font-extrabold gradient-text-sociabuzz">Support Developer</p>
@@ -308,13 +304,6 @@ export const SettingsPage = () => {
           )}
         </div>
       </div>
-
-      <BottomSheet isOpen={categorySheetOpen}
-        onClose={() => { setCategorySheetOpen(false); setEditingCategory(null) }}
-        title={editingCategory ? 'Edit Kategori' : 'Kategori Baru'}>
-        <CategoryForm category={editingCategory}
-          onClose={() => { setCategorySheetOpen(false); setEditingCategory(null) }} />
-      </BottomSheet>
     </div>
   )
 }

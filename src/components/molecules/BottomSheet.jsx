@@ -1,9 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 export const BottomSheet = ({ isOpen, onClose, title, children, className = '' }) => {
-  const overlayRef = useRef(null)
-
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -23,45 +22,53 @@ export const BottomSheet = ({ isOpen, onClose, title, children, className = '' }
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end lg:justify-center lg:items-center">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/65 backdrop-blur-[6px] animate-fade-in"
+        className="fixed inset-0 bg-black/75 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
       />
 
-      {/* Sheet */}
+      {/* Sheet / Modal */}
       <div className={`
         relative bg-bg-surface border border-border shadow-float
-        rounded-t-[2rem] lg:rounded-3xl
-        w-full lg:max-w-md max-h-[92vh] overflow-hidden flex flex-col
-        animate-slide-up
+        rounded-t-[2rem] sm:rounded-3xl
+        w-full sm:max-w-lg
+        max-h-[90dvh] sm:max-h-[85vh]
+        flex flex-col
+        animate-slide-up sm:animate-scale-in
+        z-10 overflow-hidden safe-bottom
         ${className}
       `}>
         {/* Pull handle (mobile only) */}
-        <div className="lg:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
+        <div className="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0 cursor-pointer" onClick={onClose}>
           <div className="w-10 h-1 rounded-full bg-bg-overlay" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-border flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border flex-shrink-0 bg-bg-surface">
           <h2 className="text-base font-bold text-text-primary">{title}</h2>
           <button
             onClick={onClose}
             className="h-8 w-8 rounded-xl bg-bg-elevated flex items-center justify-center
               text-text-muted hover:text-text-primary hover:bg-bg-overlay
               transition-all duration-150 hover:scale-110 active:scale-95"
+            aria-label="Tutup"
           >
             <X size={15} />
           </button>
         </div>
 
         {/* Scrollable content */}
-        <div className="overflow-y-auto flex-1 scrollbar-hide">
+        <div className="overflow-y-auto flex-1 min-h-0 overscroll-contain">
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
+
+
+

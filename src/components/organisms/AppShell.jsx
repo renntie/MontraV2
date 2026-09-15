@@ -4,6 +4,9 @@ import { BottomNav }          from '@/components/organisms/BottomNav'
 import { BottomSheet }        from '@/components/molecules/BottomSheet'
 import { TransactionForm }    from '@/components/organisms/TransactionForm'
 import { CategoryForm }       from '@/components/organisms/CategoryForm'
+import { BudgetForm }         from '@/components/organisms/BudgetForm'
+import { SavingsForm }        from '@/components/organisms/SavingsForm'
+import { DebtForm }           from '@/components/organisms/DebtForm'
 import { ToastContainer }     from '@/components/molecules/Toast'
 import { DashboardPage }      from '@/components/pages/DashboardPage'
 import { TransactionsPage }   from '@/components/pages/TransactionsPage'
@@ -27,11 +30,14 @@ const PAGES = {
 export const AppShell = () => {
   const { user }             = useAuthStore()
   const { fetchCategories }  = useCategoryStore()
-  const { refreshAll }       = useTransactionStore()
+  const { refreshAll, selectedMonth } = useTransactionStore()
   const {
     activeRoute,
     isTransactionModalOpen, editingTransaction, closeTransactionModal,
     isCategoryModalOpen,    editingCategory,    closeCategoryModal,
+    isBudgetModalOpen,      editingBudget,      closeBudgetModal,
+    isSavingsModalOpen,     editingSaving,      closeSavingsModal,
+    isDebtModalOpen,        editingDebt,        closeDebtModal,
   } = useUIStore()
 
   useEffect(() => {
@@ -87,6 +93,47 @@ export const AppShell = () => {
           onClose={closeCategoryModal}
         />
       </BottomSheet>
+
+      {/* Budget Sheet */}
+      <BottomSheet
+        isOpen={isBudgetModalOpen}
+        onClose={closeBudgetModal}
+        title={editingBudget ? 'Edit Anggaran' : 'Buat Anggaran Baru'}
+      >
+        <BudgetForm
+          budget={editingBudget}
+          selectedMonth={selectedMonth}
+          onClose={closeBudgetModal}
+          onSaved={() => refreshAll(user?.id)}
+        />
+      </BottomSheet>
+
+      {/* Savings Sheet */}
+      <BottomSheet
+        isOpen={isSavingsModalOpen}
+        onClose={closeSavingsModal}
+        title={editingSaving ? 'Edit Target Tabungan' : 'Target Tabungan Baru'}
+      >
+        <SavingsForm
+          saving={editingSaving}
+          onClose={closeSavingsModal}
+          onSaved={() => refreshAll(user?.id)}
+        />
+      </BottomSheet>
+
+      {/* Debt Sheet */}
+      <BottomSheet
+        isOpen={isDebtModalOpen}
+        onClose={closeDebtModal}
+        title={editingDebt ? 'Edit Catatan Hutang' : 'Catat Hutang / Piutang'}
+      >
+        <DebtForm
+          debt={editingDebt}
+          onClose={closeDebtModal}
+          onSaved={() => refreshAll(user?.id)}
+        />
+      </BottomSheet>
     </div>
   )
 }
+

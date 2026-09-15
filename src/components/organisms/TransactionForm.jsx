@@ -143,17 +143,18 @@ export const TransactionForm = ({ editingTransaction = null, onClose }) => {
             Belum ada kategori. Buat di Pengaturan.
           </p>
         ) : (
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 max-h-52 overflow-y-auto p-2 bg-bg-elevated/40 rounded-2xl border border-border/60">
             {filteredCategories.map((cat) => {
               const isSelected = categoryId === cat.id
               return (
                 <button
                   key={cat.id}
+                  type="button"
                   onClick={() => { setCategoryId(cat.id); setErrors((p) => ({ ...p, category: '' })) }}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-2xl border transition-all ${
+                  className={`flex flex-col items-center gap-1.5 p-2 rounded-2xl border transition-all ${
                     isSelected
-                      ? 'border-accent-income/50 bg-accent-income/5 shadow-sm'
-                      : 'border-border hover:border-border-strong hover:bg-bg-elevated'
+                      ? 'border-accent-income bg-accent-income/10 shadow-sm scale-105'
+                      : 'border-transparent hover:border-border-strong hover:bg-bg-elevated'
                   }`}
                 >
                   <CategoryIcon
@@ -200,8 +201,8 @@ export const TransactionForm = ({ editingTransaction = null, onClose }) => {
         error={errors.date}
       />
 
-      {/* Actions */}
-      <div className="flex gap-3 pt-1">
+      {/* Sticky Action Footer */}
+      <div className="sticky bottom-0 -mx-5 -mb-6 p-4 bg-bg-surface/95 backdrop-blur-md border-t border-border flex gap-3 z-20 mt-4">
         <Button variant="secondary" onClick={onClose} className="flex-1">
           Batal
         </Button>

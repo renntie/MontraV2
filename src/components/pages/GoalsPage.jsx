@@ -6,11 +6,7 @@ import { ProgressBar } from '@/components/atoms/ProgressBar'
 import { EmptyState } from '@/components/atoms/EmptyState'
 import { Spinner } from '@/components/atoms/Spinner'
 import { Card } from '@/components/atoms/Card'
-import { BottomSheet } from '@/components/molecules/BottomSheet'
 import { MonthPicker } from '@/components/molecules/MonthPicker'
-import { SavingsForm } from '@/components/organisms/SavingsForm'
-import { DebtForm } from '@/components/organisms/DebtForm'
-import { BudgetForm } from '@/components/organisms/BudgetForm'
 import { BudgetProgress } from '@/components/organisms/BudgetProgress'
 import { savingsService } from '@/services/savingsService'
 import { debtService } from '@/services/debtService'
@@ -29,8 +25,8 @@ const TABS = [
 
 export const GoalsPage = () => {
   const { user }                            = useAuthStore()
-  const { addToast }                        = useUIStore()
-  const { selectedMonth, setSelectedMonth } = useTransactionStore()
+  const { addToast, openBudgetModal, openSavingsModal, openDebtModal } = useUIStore()
+  const { selectedMonth } = useTransactionStore()
 
   const [tab,       setTab]      = useState('budget')
   const [savings,   setSavings]  = useState([])
@@ -38,13 +34,6 @@ export const GoalsPage = () => {
   const [budgets,   setBudgets]  = useState([])
   const [spentMap,  setSpentMap] = useState({})
   const [loading,   setLoading]  = useState(true)
-
-  const [savingsSheet,  setSavingsSheet]  = useState(false)
-  const [debtSheet,     setDebtSheet]     = useState(false)
-  const [budgetSheet,   setBudgetSheet]   = useState(false)
-  const [editingSaving, setEditingSaving] = useState(null)
-  const [editingDebt,   setEditingDebt]   = useState(null)
-  const [editingBudget, setEditingBudget] = useState(null)
 
   const loadData = useCallback(async () => {
     if (!user?.id) return
@@ -102,9 +91,9 @@ export const GoalsPage = () => {
   }
 
   const handleAdd = () => {
-    if (tab === 'savings') { setEditingSaving(null); setSavingsSheet(true) }
-    if (tab === 'debt')    { setEditingDebt(null);   setDebtSheet(true) }
-    if (tab === 'budget')  { setEditingBudget(null); setBudgetSheet(true) }
+    if (tab === 'savings') openSavingsModal(null)
+    if (tab === 'debt')    openDebtModal(null)
+    if (tab === 'budget')  openBudgetModal(null)
   }
 
   return (
@@ -159,7 +148,7 @@ export const GoalsPage = () => {
               <BudgetTabContent
                 budgets={budgets}
                 spentMap={spentMap}
-                onEdit={(b) => { setEditingBudget(b); setBudgetSheet(true) }}
+                onEdit={(b) => openBudgetModal(b)}
                 onDelete={handleDeleteBudget}
                 onCreate={handleAdd}
               />
@@ -167,7 +156,7 @@ export const GoalsPage = () => {
             {tab === 'savings' && (
               <SavingsTabContent
                 savings={savings}
-                onEdit={(s) => { setEditingSaving(s); setSavingsSheet(true) }}
+                onEdit={(s) => openSavingsModal(s)}
                 onDelete={handleDeleteSaving}
                 onCreate={handleAdd}
               />
@@ -175,7 +164,7 @@ export const GoalsPage = () => {
             {tab === 'debt' && (
               <DebtTabContent
                 debts={debts}
-                onEdit={(d) => { setEditingDebt(d); setDebtSheet(true) }}
+                onEdit={(d) => openDebtModal(d)}
                 onDelete={handleDeleteDebt}
                 onToggleSettle={handleToggleSettle}
                 onCreate={handleAdd}
@@ -184,25 +173,6 @@ export const GoalsPage = () => {
           </div>
         )}
       </div>
-
-      {/* Sheets */}
-      <BottomSheet isOpen={savingsSheet} onClose={() => { setSavingsSheet(false); setEditingSaving(null) }}
-        title={editingSaving ? 'Edit Target Tabungan' : 'Target Tabungan Baru'}>
-        <SavingsForm saving={editingSaving}
-          onClose={() => { setSavingsSheet(false); setEditingSaving(null) }} onSaved={loadData} />
-      </BottomSheet>
-
-      <BottomSheet isOpen={debtSheet} onClose={() => { setDebtSheet(false); setEditingDebt(null) }}
-        title={editingDebt ? 'Edit Catatan' : 'Catat Hutang / Piutang'}>
-        <DebtForm debt={editingDebt}
-          onClose={() => { setDebtSheet(false); setEditingDebt(null) }} onSaved={loadData} />
-      </BottomSheet>
-
-      <BottomSheet isOpen={budgetSheet} onClose={() => { setBudgetSheet(false); setEditingBudget(null) }}
-        title={editingBudget ? 'Edit Anggaran' : 'Buat Anggaran Baru'}>
-        <BudgetForm budget={editingBudget} selectedMonth={selectedMonth}
-          onClose={() => { setBudgetSheet(false); setEditingBudget(null) }} onSaved={loadData} />
-      </BottomSheet>
     </div>
   )
 }
