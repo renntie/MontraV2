@@ -1,7 +1,7 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import {
   LayoutDashboard, ArrowLeftRight, BarChart3, Target, Settings,
-  LogOut, Plus, Download, ChevronRight, Heart,
+  LogOut, Plus, Download, ChevronRight, Heart, Wallet, Eye, EyeOff,
 } from 'lucide-react'
 import { MontraLogo } from '@/components/atoms/MontraLogo'
 import { Avatar } from '@/components/atoms/Avatar'
@@ -12,15 +12,16 @@ import { useInstallPWA } from '@/hooks/useInstallPWA'
 const NAV_ITEMS = [
   { id: 'dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
   { id: 'transactions', icon: ArrowLeftRight,  label: 'Transaksi' },
-  { id: 'analytics',   icon: BarChart3,        label: 'Analitik' },
-  { id: 'goals',       icon: Target,           label: 'Tujuan & Hutang' },
+  { id: 'wallets',      icon: Wallet,          label: 'Dompet' },
+  { id: 'analytics',    icon: BarChart3,        label: 'Analitik' },
+  { id: 'goals',        icon: Target,           label: 'Tujuan & Hutang' },
   { id: 'settings',    icon: Settings,         label: 'Pengaturan' },
 ]
 
 const SOCIABUZZ_URL = 'https://sociabuzz.com/lilramm'
 
 export const Sidebar = () => {
-  const { activeRoute, setActiveRoute, openTransactionModal } = useUIStore()
+  const { activeRoute, setActiveRoute, openTransactionModal, isPrivacyMode, togglePrivacyMode } = useUIStore()
   const { user, signOut } = useAuthStore()
   const { canInstall, install, installed } = useInstallPWA()
   const [installing, setInstalling] = useState(false)
@@ -164,6 +165,20 @@ export const Sidebar = () => {
             <p className="text-xs text-text-muted truncate">{email}</p>
           </div>
         </div>
+        <button
+          onClick={togglePrivacyMode}
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl text-xs font-semibold mb-2 transition-all ${
+            isPrivacyMode
+              ? 'bg-accent-income/10 text-accent-income border border-accent-income/20'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated border border-transparent'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {isPrivacyMode ? <EyeOff size={14} /> : <Eye size={14} />}
+            <span>Mode Privasi</span>
+          </div>
+          <span className="text-[10px] font-bold uppercase">{isPrivacyMode ? 'Aktif' : 'Off'}</span>
+        </button>
         <button
           onClick={signOut}
           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm

@@ -1,10 +1,16 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { CategoryIcon } from '@/components/atoms/CategoryIcon'
-import { formatCurrency, formatRelativeDate } from '@/utils/formatters'
+import { formatCurrency } from '@/utils/formatters'
+import { formatRelativeDate } from '@/utils/formatters'
+import { useWalletStore } from '@/store/walletStore'
+import { useUIStore } from '@/store/uiStore'
 
 export const TransactionItem = ({ transaction, onEdit, onDelete }) => {
-  const { type, amount, note, date, categories } = transaction
+  const { type, amount, note, date, categories, wallet_id } = transaction
+  const { wallets } = useWalletStore()
+  const { isPrivacyMode } = useUIStore()
+  const wallet = wallets.find((w) => w.id === wallet_id)
   const isIncome = type === 'income'
   const [deleting, setDeleting] = useState(false)
 
@@ -34,9 +40,17 @@ export const TransactionItem = ({ transaction, onEdit, onDelete }) => {
         <p className="text-sm font-semibold text-text-primary truncate leading-snug">
           {note || categories?.name || 'Transaksi'}
         </p>
-        <p className="text-xs text-text-muted mt-0.5 truncate">
-          {categories?.name}
-          {categories?.name && date ? ' · ' : ''}
+        <p className="text-xs text-text-muted mt-0.5 truncate flex items-center gap-1.5 flex-wrap">
+          {categories?.name && <span>{categories.name}</span>}
+          {wallet && (
+            <span
+              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium"
+              style={{ backgroundColor: `${wallet.color || '#34D399'}20`, color: wallet.color || '#34D399' }}
+            >
+              {wallet.name}
+            </span>
+          )}
+          {(categories?.name || wallet) && date ? ' · ' : ''}
           {date ? formatRelativeDate(date) : ''}
         </p>
       </div>
@@ -48,7 +62,9 @@ export const TransactionItem = ({ transaction, onEdit, onDelete }) => {
           group-hover:mr-1
           ${isIncome ? 'text-accent-income' : 'text-accent-expense'}
         `}>
-          {isIncome ? '+' : '-'}{formatCurrency(amount, { compact: true })}
+          {isPrivacyMode
+            ? '••••••••'
+            : `${isIncome ? '+' : '-'}${formatCurrency(amount, { compact: true })}`}
         </span>
 
         <div className="flex gap-0.5 overflow-hidden max-w-0 group-hover:max-w-[64px] transition-all duration-200">

@@ -2,7 +2,8 @@ import { format, isToday, isYesterday, parseISO } from 'date-fns'
 import { id } from 'date-fns/locale'
 
 export const formatCurrency = (amount, options = {}) => {
-  const { compact = false, showSign = false } = options
+  const { compact = false, showSign = false, masked = false } = options
+  if (masked) return 'Rp ••••••••'
   const absAmount = Math.abs(amount)
   
   if (compact && absAmount >= 1_000_000_000) {
@@ -24,6 +25,11 @@ export const formatCurrency = (amount, options = {}) => {
 
   if (showSign) return amount >= 0 ? `+${formatted}` : `-${formatted}`
   return formatted
+}
+
+export const formatPrivacyCurrency = (amount, isPrivacy = false, options = {}) => {
+  if (isPrivacy) return 'Rp ••••••••'
+  return formatCurrency(amount, options)
 }
 
 export const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {

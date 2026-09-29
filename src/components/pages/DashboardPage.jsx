@@ -1,5 +1,9 @@
-﻿import { useEffect, useState } from 'react'
-import { Download, LogOut, RefreshCw, Heart, ExternalLink, Settings, ArrowRight, ArrowLeftRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+  Download, LogOut, RefreshCw, Heart, ExternalLink, Settings,
+  ArrowRight, ArrowLeftRight, Wallet, Users, Plus, ChevronRight,
+  Building2, Smartphone, TrendingUp, MoreHorizontal, Eye, EyeOff
+} from 'lucide-react'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import { SummaryCard } from '@/components/molecules/SummaryCard'
@@ -13,6 +17,7 @@ import { MontraLogo } from '@/components/atoms/MontraLogo'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
+import { useWalletStore } from '@/store/walletStore'
 import { exportTransactionsToCSV } from '@/utils/csvExport'
 import { formatCurrency } from '@/utils/formatters'
 
@@ -24,7 +29,12 @@ export const DashboardPage = () => {
     transactions, summary, categoryBreakdown, loading,
     selectedMonth, setSelectedMonth, refreshAll,
   } = useTransactionStore()
-  const { openTransactionModal, setActiveRoute, addToast } = useUIStore()
+  const {
+    openTransactionModal, setActiveRoute, addToast,
+    openWalletModal, openTransferModal, openSplitBillModal, openSubscriptionModal,
+    isPrivacyMode, togglePrivacyMode,
+  } = useUIStore()
+  const { wallets, balances, getTotalBalance, fetchWallets } = useWalletStore()
   const [spinning, setSpinning] = useState(false)
 
   useEffect(() => {
@@ -54,18 +64,21 @@ export const DashboardPage = () => {
         {/* Actions kanan */}
         <div className="flex items-center gap-2">
           {[
+            { icon: isPrivacyMode ? EyeOff : Eye, onClick: togglePrivacyMode, spin: false, label: 'privacy', active: isPrivacyMode },
             { icon: RefreshCw, onClick: handleRefresh, spin: spinning, label: 'refresh' },
             { icon: Download,  onClick: handleExport,  spin: false,    label: 'export' },
             { icon: Settings,  onClick: () => setActiveRoute('settings'), spin: false, label: 'settings' },
             { icon: LogOut,    onClick: signOut,       spin: false,    label: 'logout', danger: true },
-          ].map(({ icon: Icon, onClick, spin, label, danger }) => (
+          ].map(({ icon: Icon, onClick, spin, label, danger, active }) => (
             <button
               key={label}
               onClick={onClick}
               aria-label={label}
               className={`h-9 w-9 rounded-2xl bg-bg-surface border border-border flex items-center justify-center
                 transition-all duration-200 hover:scale-105 active:scale-95
-                ${danger
+                ${active
+                  ? 'text-accent-income bg-accent-income/10 border-accent-income/30'
+                  : danger
                   ? 'text-text-muted hover:text-accent-expense hover:bg-accent-expense/5'
                   : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'}`}
             >
@@ -84,6 +97,19 @@ export const DashboardPage = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={togglePrivacyMode}
+            title={isPrivacyMode ? 'Tampilkan Saldo' : 'Sembunyikan Saldo (Sensor)'}
+            className={`h-9 px-3.5 rounded-2xl border flex items-center gap-2 text-xs font-semibold
+              transition-all duration-200 hover:scale-105 ${
+                isPrivacyMode
+                  ? 'bg-accent-income/15 border-accent-income/30 text-accent-income'
+                  : 'bg-bg-elevated border-border text-text-muted hover:text-text-primary'
+              }`}
+          >
+            {isPrivacyMode ? <EyeOff size={15} /> : <Eye size={15} />}
+            <span>{isPrivacyMode ? 'Sensor Aktif' : 'Sensor Saldo'}</span>
+          </button>
           <button
             onClick={handleRefresh}
             className="h-9 px-3 rounded-2xl bg-bg-elevated border border-border
@@ -118,12 +144,20 @@ export const DashboardPage = () => {
           <div className="absolute bottom-0 left-0 w-28 h-28 rounded-full bg-accent-blue/4
             translate-y-10 -translate-x-10 pointer-events-none" />
 
-          <p className="text-xs font-medium text-text-muted mb-2 relative z-10">Saldo Bersih Bulan Ini</p>
+          <div className="flex items-center justify-between mb-2 relative z-10">
+            <p className="text-xs font-medium text-text-muted">Saldo Bersih Bulan Ini</p>
+            <button
+              onClick={togglePrivacyMode}
+              title={isPrivacyMode ? 'Tampilkan saldo' : 'Sembunyikan saldo'}
+              className="text-text-muted hover:text-text-primary transition-colors p-1 rounded-lg hover:bg-bg-overlay"
+            >
+              {isPrivacyMode ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
+          </div>
           <p className={`text-3xl lg:text-4xl font-extrabold tracking-tight tabular-nums relative z-10
             transition-all duration-500
             ${balancePositive ? 'text-text-primary' : 'text-accent-expense text-glow-expense'}`}>
-            {!balancePositive && '- '}
-            {formatCurrency(Math.abs(summary.balance))}
+            {isPrivacyMode ? 'Rp ••••••••' : `${!balancePositive ? '- ' : ''}${formatCurrency(Math.abs(summary.balance))}`}
           </p>
           <p className="text-xs text-text-muted mt-2 relative z-10">
             {format(new Date(selectedMonth), 'MMMM yyyy', { locale: id })}
@@ -149,6 +183,120 @@ export const DashboardPage = () => {
             </div>
           )}
         </Card>
+
+        {/* Quick Actions Bar */}
+        <div className="grid grid-cols-4 gap-2 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+          {[
+            {
+              label: 'Dompet',
+              icon: Wallet,
+              color: 'text-accent-blue bg-accent-blue/10 border-accent-blue/20 hover:border-accent-blue/50',
+              onClick: () => setActiveRoute('wallets'),
+            },
+            {
+              label: 'Transfer',
+              icon: ArrowLeftRight,
+              color: 'text-accent-purple bg-accent-purple/10 border-accent-purple/20 hover:border-accent-purple/50',
+              onClick: openTransferModal,
+            },
+            {
+              label: 'Split Bill',
+              icon: Users,
+              color: 'text-amber-400 bg-amber-400/10 border-amber-400/20 hover:border-amber-400/50',
+              onClick: openSplitBillModal,
+            },
+            {
+              label: 'Langganan',
+              icon: RefreshCw,
+              color: 'text-rose-400 bg-rose-400/10 border-rose-400/20 hover:border-rose-400/50',
+              onClick: () => setActiveRoute('goals'),
+            },
+          ].map(({ label, icon: Icon, color, onClick }) => (
+            <button
+              key={label}
+              onClick={onClick}
+              className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-bg-surface border border-border
+                hover:bg-bg-elevated transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] group text-center"
+            >
+              <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-transform duration-200 group-hover:scale-110 ${color}`}>
+                <Icon size={18} strokeWidth={2.2} />
+              </div>
+              <span className="text-[11px] font-semibold text-text-secondary truncate w-full">{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Multi-Wallet Preview Carousel */}
+        {wallets.length > 0 ? (
+          <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+            <div className="flex items-center justify-between px-1">
+              <p className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+                <Wallet size={14} className="text-accent-income" />
+                Saldo Rekening & Dompet
+              </p>
+              <button
+                onClick={() => setActiveRoute('wallets')}
+                className="text-xs text-accent-income font-medium hover:underline flex items-center gap-0.5"
+              >
+                Kelola <ChevronRight size={13} />
+              </button>
+            </div>
+            <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide">
+              {wallets.map((w) => {
+                const bal = balances[w.id] ?? w.initial_balance
+                return (
+                  <div
+                    key={w.id}
+                    onClick={() => setActiveRoute('wallets')}
+                    className="flex-shrink-0 w-44 p-3 rounded-2xl bg-bg-surface border border-border
+                      hover:border-border-strong hover:bg-bg-elevated cursor-pointer transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div
+                        className="w-2.5 h-2.5 rounded-full"
+                        style={{ backgroundColor: w.color || '#34D399' }}
+                      />
+                      <span className="text-[10px] uppercase font-bold text-text-muted tracking-wider">
+                        {w.type}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-text-primary truncate">{w.name}</p>
+                    <p className="text-sm font-extrabold text-text-primary mt-1 tabular-nums">
+                      {isPrivacyMode ? '••••••••' : formatCurrency(bal)}
+                    </p>
+                  </div>
+                )
+              })}
+              <button
+                onClick={openWalletModal}
+                className="flex-shrink-0 w-28 p-3 rounded-2xl border border-dashed border-border
+                  hover:border-accent-income/50 hover:bg-accent-income/5 flex flex-col items-center justify-center gap-1.5
+                  text-text-muted hover:text-accent-income transition-all"
+              >
+                <Plus size={18} />
+                <span className="text-[11px] font-semibold">Tambah</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="p-3.5 rounded-2xl bg-bg-surface border border-border/70 flex items-center justify-between gap-3 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-accent-blue/10 border border-accent-blue/20 flex items-center justify-center text-accent-blue">
+                <Wallet size={16} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-text-primary">Kelola Multi-Wallet</p>
+                <p className="text-[11px] text-text-muted">Pisahkan saldo rekening Bank, E-Wallet & Tunai</p>
+              </div>
+            </div>
+            <button
+              onClick={openWalletModal}
+              className="px-3 py-1.5 rounded-xl bg-accent-income text-bg text-xs font-bold hover:brightness-110 active:scale-95 transition-all flex-shrink-0"
+            >
+              + Buat
+            </button>
+          </div>
+        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 gap-3">

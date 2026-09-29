@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { LayoutDashboard, ArrowLeftRight, BarChart3, Target, Plus } from 'lucide-react'
 import { useUIStore } from '@/store/uiStore'
 
@@ -13,10 +13,12 @@ export const BottomNav = () => {
   const {
     activeRoute, setActiveRoute, openTransactionModal,
     isTransactionModalOpen, isCategoryModalOpen, isBudgetModalOpen, isSavingsModalOpen, isDebtModalOpen,
+    isWalletModalOpen, isTransferModalOpen, isSubscriptionModalOpen, isSplitBillModalOpen,
   } = useUIStore()
 
   const isModalOpen = Boolean(
-    isTransactionModalOpen || isCategoryModalOpen || isBudgetModalOpen || isSavingsModalOpen || isDebtModalOpen
+    isTransactionModalOpen || isCategoryModalOpen || isBudgetModalOpen || isSavingsModalOpen || isDebtModalOpen ||
+    isWalletModalOpen || isTransferModalOpen || isSubscriptionModalOpen || isSplitBillModalOpen
   )
 
   if (isModalOpen) return null

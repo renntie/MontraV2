@@ -7,16 +7,21 @@ import { useTransactionStore } from '@/store/transactionStore'
 import { useCategoryStore } from '@/store/categoryStore'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
+import { useWalletStore } from '@/store/walletStore'
+import { Wallet } from 'lucide-react'
+import { formatCurrency } from '@/utils/formatters'
 
 export const TransactionForm = ({ editingTransaction = null, onClose }) => {
   const { user } = useAuthStore()
   const { addTransaction, updateTransaction, fetchSummary, fetchCategoryBreakdown } = useTransactionStore()
   const { categories } = useCategoryStore()
+  const { wallets, balances, refreshBalance, fetchWallets } = useWalletStore()
   const { addToast } = useUIStore()
 
   const [type,       setType]       = useState(editingTransaction?.type       || 'expense')
   const [amount,     setAmount]     = useState(editingTransaction?.amount?.toString() || '')
   const [categoryId, setCategoryId] = useState(editingTransaction?.category_id || '')
+  const [walletId,   setWalletId]   = useState(editingTransaction?.wallet_id   || wallets[0]?.id || '')
   const [note,       setNote]       = useState(editingTransaction?.note        || '')
   const [date,       setDate]       = useState(editingTransaction?.date        || format(new Date(), 'yyyy-MM-dd'))
   const [loading,    setLoading]    = useState(false)
@@ -28,10 +33,13 @@ export const TransactionForm = ({ editingTransaction = null, onClose }) => {
       setType(editingTransaction.type || 'expense')
       setAmount(editingTransaction.amount?.toString() || '')
       setCategoryId(editingTransaction.category_id || '')
+      setWalletId(editingTransaction.wallet_id || wallets[0]?.id || '')
       setNote(editingTransaction.note || '')
       setDate(editingTransaction.date || format(new Date(), 'yyyy-MM-dd'))
+    } else if (!walletId && wallets.length > 0) {
+      setWalletId(wallets[0].id)
     }
-  }, [editingTransaction])
+  }, [editingTransaction, wallets])
 
   const filteredCategories = categories.filter(
     (c) => c.type === type || c.type === 'both'
@@ -56,6 +64,7 @@ export const TransactionForm = ({ editingTransaction = null, onClose }) => {
         type,
         amount:      Number(amount),
         category_id: categoryId,
+        wallet_id:   walletId || null,
         note:        note.trim() || null,
         date,
       }
@@ -69,6 +78,7 @@ export const TransactionForm = ({ editingTransaction = null, onClose }) => {
       await Promise.all([
         fetchSummary(user.id),
         fetchCategoryBreakdown(user.id),
+        walletId ? refreshBalance(walletId) : Promise.resolve(),
       ])
       onClose()
     } catch (err) {
@@ -134,6 +144,52 @@ export const TransactionForm = ({ editingTransaction = null, onClose }) => {
           <p className="mt-1 text-xs text-accent-expense">{errors.amount}</p>
         )}
       </div>
+
+      {/* Wallet Selector (Multi-Wallet) */}
+      {wallets.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+              <Wallet size={13} className="text-accent-blue" />
+              Dompet / Rekening
+            </label>
+            <span className="text-[11px] text-text-muted">
+              {wallets.find((w) => w.id === walletId)?.name || 'Pilih Dompet'}
+            </span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {wallets.map((w) => {
+              const isSelected = walletId === w.id
+              const bal = balances[w.id] ?? w.initial_balance
+              return (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => setWalletId(w.id)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-2xl border text-left flex-shrink-0 transition-all ${
+                    isSelected
+                      ? 'border-accent-income bg-accent-income/10 shadow-sm ring-1 ring-accent-income/30'
+                      : 'border-border bg-bg-elevated/70 hover:bg-bg-elevated text-text-secondary'
+                  }`}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: w.color || '#34D399' }}
+                  />
+                  <div className="min-w-0">
+                    <p className={`text-xs font-semibold truncate ${isSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
+                      {w.name}
+                    </p>
+                    <p className="text-[10px] text-text-muted tabular-nums">
+                      {formatCurrency(bal, { compact: true })}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Category Grid */}
       <div>

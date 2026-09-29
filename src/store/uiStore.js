@@ -4,7 +4,7 @@ import { devtools } from 'zustand/middleware'
 export const useUIStore = create(
   devtools(
     (set) => ({
-      // Active route — 5 halaman
+      // Active route
       activeRoute: 'dashboard',
 
       // Transaction modal
@@ -26,6 +26,32 @@ export const useUIStore = create(
       // Debt modal
       isDebtModalOpen: false,
       editingDebt: null,
+
+      // Wallet modal
+      isWalletModalOpen: false,
+      editingWallet: null,
+
+      // Transfer modal
+      isTransferModalOpen: false,
+      editingTransfer: null,
+
+      // Subscription modal
+      isSubscriptionModalOpen: false,
+      editingSubscription: null,
+
+      // Split Bill modal
+      isSplitBillModalOpen: false,
+
+      // Privacy Mode (Sensor Saldo)
+      isPrivacyMode: typeof window !== 'undefined' ? localStorage.getItem('montra_privacy_mode') === 'true' : false,
+      togglePrivacyMode: () =>
+        set((s) => {
+          const next = !s.isPrivacyMode
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('montra_privacy_mode', String(next))
+          }
+          return { isPrivacyMode: next }
+        }),
 
       // Toast notifications
       toasts: [],
@@ -62,6 +88,28 @@ export const useUIStore = create(
         set({ isDebtModalOpen: true, editingDebt: d }),
       closeDebtModal: () =>
         set({ isDebtModalOpen: false, editingDebt: null }),
+
+      // Wallet modal actions
+      openWalletModal: (w = null) =>
+        set({ isWalletModalOpen: true, editingWallet: w }),
+      closeWalletModal: () =>
+        set({ isWalletModalOpen: false, editingWallet: null }),
+
+      // Transfer modal actions
+      openTransferModal: (t = null) =>
+        set({ isTransferModalOpen: true, editingTransfer: t }),
+      closeTransferModal: () =>
+        set({ isTransferModalOpen: false, editingTransfer: null }),
+
+      // Subscription modal actions
+      openSubscriptionModal: (sub = null) =>
+        set({ isSubscriptionModalOpen: true, editingSubscription: sub }),
+      closeSubscriptionModal: () =>
+        set({ isSubscriptionModalOpen: false, editingSubscription: null }),
+
+      // Split Bill modal actions
+      openSplitBillModal: () => set({ isSplitBillModalOpen: true }),
+      closeSplitBillModal: () => set({ isSplitBillModalOpen: false }),
 
       // Toast actions
       addToast: (message, type = 'success') => {

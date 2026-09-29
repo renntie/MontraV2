@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react'
 import { formatCurrency } from '@/utils/formatters'
+import { useUIStore } from '@/store/uiStore'
 import { useState } from 'react'
 
 const CONFIGS = {
@@ -12,6 +13,7 @@ export const SummaryCard = ({ type, amount }) => {
   const cfg   = CONFIGS[type] ?? CONFIGS.balance
   const Icon  = cfg.icon
   const [hovered, setHovered] = useState(false)
+  const { isPrivacyMode } = useUIStore()
 
   return (
     <div
@@ -28,7 +30,7 @@ export const SummaryCard = ({ type, amount }) => {
       <div>
         <p className="text-xs text-text-muted mb-0.5 font-medium">{cfg.label}</p>
         <p className={`text-lg font-extrabold tabular-nums ${cfg.valColor}`}>
-          {formatCurrency(amount, { compact: true })}
+          {isPrivacyMode ? 'Rp ••••••••' : formatCurrency(amount, { compact: true })}
         </p>
       </div>
     </div>

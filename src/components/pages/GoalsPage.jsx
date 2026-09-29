@@ -1,8 +1,9 @@
-﻿import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import * as Icons from 'lucide-react'
 import {
   Plus, Pencil, Trash2, CheckCircle2, CreditCard, Target, BookMarked,
-  TrendingDown, ArrowDownLeft, Settings,
+  TrendingDown, ArrowDownLeft, Settings, RefreshCw, Scissors,
+  AlertCircle, Clock, CalendarCheck, Zap, Users,
 } from 'lucide-react'
 import { Button } from '@/components/atoms/Button'
 import { ProgressBar } from '@/components/atoms/ProgressBar'
@@ -15,21 +16,31 @@ import { savingsService } from '@/services/savingsService'
 import { debtService } from '@/services/debtService'
 import { budgetService } from '@/services/budgetService'
 import { transactionService } from '@/services/transactionService'
+import { subscriptionService } from '@/services/subscriptionService'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
 import { useTransactionStore } from '@/store/transactionStore'
+import { useSubscriptionStore } from '@/store/subscriptionStore'
 import { formatCurrency, formatDate } from '@/utils/formatters'
 
 const TABS = [
-  { id: 'budget',  label: 'Anggaran',  icon: Target },
-  { id: 'savings', label: 'Tabungan',  icon: BookMarked },
-  { id: 'debt',    label: 'Hutang',    icon: TrendingDown },
+  { id: 'budget',       label: 'Anggaran',   icon: Target },
+  { id: 'savings',      label: 'Tabungan',   icon: BookMarked },
+  { id: 'debt',         label: 'Hutang',     icon: TrendingDown },
+  { id: 'subscription', label: 'Langganan',  icon: RefreshCw },
+  { id: 'splitbill',    label: 'Split Bill', icon: Scissors },
 ]
 
 export const GoalsPage = () => {
   const { user }                            = useAuthStore()
-  const { addToast, openBudgetModal, openSavingsModal, openDebtModal, setActiveRoute } = useUIStore()
+  const {
+    addToast, openBudgetModal, openSavingsModal, openDebtModal,
+    openSubscriptionModal, openSplitBillModal, setActiveRoute,
+  } = useUIStore()
   const { selectedMonth, setSelectedMonth } = useTransactionStore()
+  const {
+    subscriptions, fetchSubscriptions, deleteSubscription, paySubscription, getMonthlyTotal,
+  } = useSubscriptionStore()
 
   const [tab,       setTab]      = useState('budget')
   const [savings,   setSavings]  = useState([])
@@ -63,6 +74,10 @@ export const GoalsPage = () => {
 
   useEffect(() => { loadData() }, [loadData])
 
+  useEffect(() => {
+    if (user?.id) fetchSubscriptions(user.id)
+  }, [user?.id])
+
   const handleDeleteSaving = async (id) => {
     if (!confirm('Hapus target tabungan ini?')) return
     try { await savingsService.delete(id); setSavings((p) => p.filter((s) => s.id !== id)); addToast('Target dihapus') }
@@ -73,6 +88,19 @@ export const GoalsPage = () => {
     if (!confirm('Hapus catatan ini?')) return
     try { await debtService.delete(id); setDebts((p) => p.filter((d) => d.id !== id)); addToast('Catatan dihapus') }
     catch (err) { addToast(err.message, 'error') }
+  }
+
+  const handleDeleteSubscription = async (id) => {
+    if (!confirm('Hapus langganan ini?')) return
+    try { await deleteSubscription(id); addToast('Langganan dihapus') }
+    catch (err) { addToast(err.message, 'error') }
+  }
+
+  const handlePaySubscription = async (sub) => {
+    try {
+      await paySubscription(user.id, sub)
+      addToast(`${sub.name} berhasil dibayar, transaksi dicatat!`)
+    } catch (err) { addToast(err.message, 'error') }
   }
 
   const handleToggleSettle = async (debt) => {
@@ -94,9 +122,11 @@ export const GoalsPage = () => {
   }
 
   const handleAdd = () => {
-    if (tab === 'savings') openSavingsModal(null)
-    if (tab === 'debt')    openDebtModal(null)
-    if (tab === 'budget')  openBudgetModal(null)
+    if (tab === 'savings')      openSavingsModal(null)
+    if (tab === 'debt')         openDebtModal(null)
+    if (tab === 'budget')       openBudgetModal(null)
+    if (tab === 'subscription') openSubscriptionModal(null)
+    if (tab === 'splitbill')    openSplitBillModal()
   }
 
   return (
@@ -126,21 +156,21 @@ export const GoalsPage = () => {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-bg-elevated rounded-2xl">
+        {/* Tabs - scrollable on mobile */}
+        <div className="flex gap-1 p-1 bg-bg-elevated rounded-2xl overflow-x-auto scrollbar-hide">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setTab(id)}
               className={`
-                flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl
-                text-xs font-semibold transition-all duration-250
+                flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl
+                text-[11px] font-semibold transition-all duration-250 flex-shrink-0
                 ${tab === id
-                  ? 'bg-bg-surface text-text-primary shadow-card scale-[1.02]'
+                  ? 'bg-bg-surface text-text-primary shadow-card'
                   : 'text-text-muted hover:text-text-secondary'}
               `}
             >
-              <Icon size={13} className={tab === id ? 'text-accent-income' : ''} />
+              <Icon size={12} className={tab === id ? 'text-accent-income' : ''} />
               {label}
             </button>
           ))}
@@ -184,6 +214,19 @@ export const GoalsPage = () => {
                 onToggleSettle={handleToggleSettle}
                 onCreate={handleAdd}
               />
+            )}
+            {tab === 'subscription' && (
+              <SubscriptionTabContent
+                subscriptions={subscriptions}
+                monthlyTotal={getMonthlyTotal()}
+                onEdit={(s) => openSubscriptionModal(s)}
+                onDelete={handleDeleteSubscription}
+                onPay={handlePaySubscription}
+                onCreate={handleAdd}
+              />
+            )}
+            {tab === 'splitbill' && (
+              <SplitBillTabContent onOpen={openSplitBillModal} debts={debts} />
             )}
           </div>
         )}
@@ -372,6 +415,153 @@ const DebtTabContent = ({ debts, onEdit, onDelete, onToggleSettle, onCreate }) =
             </>
           )}
           <Button variant="secondary" className="w-full" icon={Plus} onClick={onCreate}>Tambah Catatan</Button>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── Subscription Tab ─────────────────────────────────────────────────────────
+const FREQ_LABEL = { daily: 'Harian', weekly: 'Mingguan', monthly: 'Bulanan', yearly: 'Tahunan' }
+const STATUS_META = {
+  overdue:  { icon: AlertCircle,  label: 'Terlambat',  cls: 'text-accent-expense', bg: 'bg-accent-expense/10' },
+  today:    { icon: Zap,          label: 'Hari Ini',   cls: 'text-accent-yellow',  bg: 'bg-accent-yellow/10' },
+  upcoming: { icon: CalendarCheck,label: 'Mendatang',  cls: 'text-accent-blue',    bg: 'bg-accent-blue/10' },
+}
+
+const SubscriptionTabContent = ({ subscriptions, monthlyTotal, onEdit, onDelete, onPay, onCreate }) => {
+  const active   = subscriptions.filter((s) => s.is_active)
+  const inactive = subscriptions.filter((s) => !s.is_active)
+
+  return (
+    <div className="space-y-3">
+      {subscriptions.length > 0 && (
+        <Card className="p-4 bg-gradient-to-br from-accent-blue/10 to-accent-purple/5 border-accent-blue/20">
+          <p className="text-xs text-text-muted mb-1">Total Pengeluaran Tetap / Bulan</p>
+          <p className="text-xl font-extrabold text-text-primary">{formatCurrency(monthlyTotal)}</p>
+          <p className="text-xs text-text-muted mt-1">{active.length} langganan aktif</p>
+        </Card>
+      )}
+
+      {subscriptions.length === 0 ? (
+        <EmptyState icon={RefreshCw} title="Belum ada langganan"
+          description="Catat biaya rutin seperti Netflix, Spotify, wifi, kos, dan tagihan bulanan"
+          action={<Button size="sm" icon={Plus} onClick={onCreate}>Tambah Langganan</Button>} />
+      ) : (
+        <>
+          {active.length > 0 && (
+            <>
+              <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Aktif ({active.length})</p>
+              {active.map((sub, i) => {
+                const status = subscriptionService.getDueStatus(sub.next_due)
+                const meta   = STATUS_META[status]
+                return (
+                  <Card key={sub.id} className={`p-4 animate-fade-in stagger-${Math.min(i+1,5)}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: (sub.color || '#60A5FA') + '22' }}>
+                        {(() => {
+                          const SubIcon = Icons[sub.icon] || Icons.RefreshCw
+                          return <SubIcon size={20} style={{ color: sub.color || '#60A5FA' }} strokeWidth={2} />
+                        })()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-text-primary truncate">{sub.name}</p>
+                        <p className="text-xs text-text-muted">
+                          {FREQ_LABEL[sub.frequency]} · Jatuh tempo {formatDate(sub.next_due)}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-extrabold text-accent-expense">{formatCurrency(sub.amount, { compact: true })}</p>
+                        <div className={`flex items-center gap-1 justify-end mt-0.5 ${meta.bg} rounded-lg px-1.5 py-0.5`}>
+                          <meta.icon size={9} className={meta.cls} />
+                          <span className={`text-[9px] font-bold ${meta.cls}`}>{meta.label}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+                      <button onClick={() => onPay(sub)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold
+                          bg-accent-income/10 text-accent-income hover:bg-accent-income/20 transition-all duration-150">
+                        <Zap size={12} /> Bayar Sekarang
+                      </button>
+                      <button onClick={() => onEdit(sub)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold
+                          bg-bg-elevated text-text-secondary hover:bg-bg-overlay transition-all duration-150">
+                        <Pencil size={12} /> Edit
+                      </button>
+                      <button onClick={() => onDelete(sub.id)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold
+                          bg-accent-expense/10 text-accent-expense hover:bg-accent-expense/20 transition-all duration-150">
+                        <Trash2 size={12} /> Hapus
+                      </button>
+                    </div>
+                  </Card>
+                )
+              })}
+            </>
+          )}
+          <Button variant="secondary" className="w-full" icon={Plus} onClick={onCreate}>Tambah Langganan</Button>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── Split Bill Tab ───────────────────────────────────────────────────────────
+const SplitBillTabContent = ({ onOpen, debts }) => {
+  const splitDebts = debts.filter((d) => d.note?.startsWith('Split bill:'))
+  const totalPending = splitDebts.filter((d) => d.status === 'unpaid').reduce((s, d) => s + d.amount, 0)
+
+  return (
+    <div className="space-y-3">
+      {/* CTA Card */}
+      <Card
+        className="p-5 bg-gradient-to-br from-accent-purple/10 to-accent-blue/5 border-accent-purple/20 cursor-pointer hover:border-accent-purple/40 transition-all duration-200"
+        onClick={onOpen}
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-accent-purple/20 flex items-center justify-center flex-shrink-0">
+            <Scissors size={26} className="text-accent-purple" />
+          </div>
+          <div className="flex-1">
+            <p className="text-base font-extrabold text-text-primary mb-1">Bagi Tagihan</p>
+            <p className="text-xs text-text-muted leading-relaxed">
+              Hitung split bill dengan teman secara otomatis. Bagian teman langsung tercatat sebagai piutang.
+            </p>
+            <Button size="sm" className="mt-3" icon={Users}>Split Bill Sekarang</Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Recent split bills from debts */}
+      {splitDebts.length > 0 && (
+        <>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Split Bill Aktif</p>
+            <span className="text-xs text-accent-expense font-semibold">{formatCurrency(totalPending, { compact: true })}</span>
+          </div>
+          {splitDebts.slice(0, 5).map((d) => (
+            <Card key={d.id} className="p-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-accent-purple/15 flex items-center justify-center flex-shrink-0">
+                  <Scissors size={14} className="text-accent-purple" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-text-primary truncate">{d.note?.replace('Split bill: ', '')}</p>
+                  <p className="text-[10px] text-text-muted">{d.person_name}</p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-xs font-bold ${d.status === 'paid' ? 'text-text-muted line-through' : 'text-accent-income'}`}>
+                    {formatCurrency(d.amount, { compact: true })}
+                  </p>
+                  <p className={`text-[9px] font-semibold ${d.status === 'paid' ? 'text-text-muted' : 'text-accent-income'}`}>
+                    {d.status === 'paid' ? 'Lunas' : 'Belum'}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          ))}
         </>
       )}
     </div>
