@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Plus, Download, X, ArrowLeftRight, Settings, TrendingUp, TrendingDown } from 'lucide-react'
 import { SearchBar } from '@/components/molecules/SearchBar'
 import { TransactionItem } from '@/components/molecules/TransactionItem'
@@ -52,7 +52,7 @@ export const TransactionsPage = () => {
   const hasActiveFilters = filters.type || filters.categoryId
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-x-hidden">
       {/* Header */}
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">

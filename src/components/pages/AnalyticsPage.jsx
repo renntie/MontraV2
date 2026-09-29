@@ -56,7 +56,7 @@ export const AnalyticsPage = () => {
     'Pengeluaran melebihi pemasukan'
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-x-hidden">
       {/* Header */}
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0 space-y-3">
         <div className="flex items-center justify-between">
@@ -88,21 +88,21 @@ export const AnalyticsPage = () => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex gap-1 p-1 bg-bg-elevated rounded-2xl">
+        <div className="flex gap-1 p-1 bg-bg-elevated rounded-2xl overflow-x-auto scrollbar-hide">
           {ANALYTICS_TABS.map(({ id, label, icon: Icon }) => {
             const isActive = activeTab === id
             return (
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                className={`flex-1 flex-shrink-0 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive
                     ? 'bg-bg-surface text-text-primary shadow-sm scale-[1.02]'
                     : 'text-text-muted hover:text-text-secondary'
                 }`}
               >
-                <Icon size={14} className={isActive ? 'text-accent-income' : ''} />
-                <span className="truncate">{label}</span>
+                <Icon size={13} className={isActive ? 'text-accent-income' : ''} />
+                <span>{label}</span>
               </button>
             )
           })}
@@ -115,7 +115,7 @@ export const AnalyticsPage = () => {
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto px-4 lg:px-6 pb-28 lg:pb-6 space-y-4 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 lg:px-6 pb-28 lg:pb-6 space-y-4 scrollbar-hide">
         {/* Tab 1: Overview */}
         {activeTab === 'overview' && (
           <>

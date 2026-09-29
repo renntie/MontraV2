@@ -216,19 +216,21 @@ export const FinancialHealthCard = ({ transactions = [], summary = {} }) => {
         <div className="space-y-3.5">
           {/* Needs */}
           <div className="p-3 rounded-2xl bg-bg-elevated/50 border border-border/60">
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-accent-blue" />
-                <span className="font-bold text-text-primary">Kebutuhan (Needs)</span>
-                <span className="text-[10px] text-text-muted">Target: 50%</span>
+            <div className="flex items-start justify-between gap-2 text-xs mb-1.5">
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-accent-blue flex-shrink-0" />
+                  <span className="font-bold text-text-primary truncate">Kebutuhan (Needs)</span>
+                </div>
+                <span className="text-[10px] text-text-muted mt-0.5 pl-4">Target: 50%</span>
               </div>
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 <span className="font-extrabold text-text-primary tabular-nums">
                   {analysis.needsPct.toFixed(0)}%
                 </span>
-                <span className="text-text-muted text-[11px] ml-1.5">
-                  ({isPrivacyMode ? '••••••••' : formatCurrency(analysis.needs, { compact: true })})
-                </span>
+                <div className="text-text-muted text-[10px]">
+                  {isPrivacyMode ? '••••••••' : formatCurrency(analysis.needs, { compact: true })}
+                </div>
               </div>
             </div>
             <div className="h-1.5 bg-bg-overlay rounded-full overflow-hidden">
@@ -246,19 +248,21 @@ export const FinancialHealthCard = ({ transactions = [], summary = {} }) => {
 
           {/* Wants */}
           <div className="p-3 rounded-2xl bg-bg-elevated/50 border border-border/60">
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-accent-purple" />
-                <span className="font-bold text-text-primary">Keinginan (Wants)</span>
-                <span className="text-[10px] text-text-muted">Target: 30%</span>
+            <div className="flex items-start justify-between gap-2 text-xs mb-1.5">
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-accent-purple flex-shrink-0" />
+                  <span className="font-bold text-text-primary truncate">Keinginan (Wants)</span>
+                </div>
+                <span className="text-[10px] text-text-muted mt-0.5 pl-4">Target: 30%</span>
               </div>
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 <span className="font-extrabold text-text-primary tabular-nums">
                   {analysis.wantsPct.toFixed(0)}%
                 </span>
-                <span className="text-text-muted text-[11px] ml-1.5">
-                  ({isPrivacyMode ? '••••••••' : formatCurrency(analysis.wants, { compact: true })})
-                </span>
+                <div className="text-text-muted text-[10px]">
+                  {isPrivacyMode ? '••••••••' : formatCurrency(analysis.wants, { compact: true })}
+                </div>
               </div>
             </div>
             <div className="h-1.5 bg-bg-overlay rounded-full overflow-hidden">
@@ -276,19 +280,21 @@ export const FinancialHealthCard = ({ transactions = [], summary = {} }) => {
 
           {/* Savings */}
           <div className="p-3 rounded-2xl bg-bg-elevated/50 border border-border/60">
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-accent-income" />
-                <span className="font-bold text-text-primary">Tabungan & Investasi</span>
-                <span className="text-[10px] text-text-muted">Target: 20%</span>
+            <div className="flex items-start justify-between gap-2 text-xs mb-1.5">
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-accent-income flex-shrink-0" />
+                  <span className="font-bold text-text-primary truncate">Tabungan &amp; Investasi</span>
+                </div>
+                <span className="text-[10px] text-text-muted mt-0.5 pl-4">Target: 20%</span>
               </div>
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 <span className="font-extrabold text-accent-income tabular-nums">
                   {analysis.savingsPct.toFixed(0)}%
                 </span>
-                <span className="text-text-muted text-[11px] ml-1.5">
-                  ({isPrivacyMode ? '••••••••' : formatCurrency(analysis.netSavings, { compact: true })})
-                </span>
+                <div className="text-text-muted text-[10px]">
+                  {isPrivacyMode ? '••••••••' : formatCurrency(analysis.netSavings, { compact: true })}
+                </div>
               </div>
             </div>
             <div className="h-1.5 bg-bg-overlay rounded-full overflow-hidden">

@@ -79,7 +79,7 @@ export const FinancialCalendar = ({ transactions = [], initialDate = new Date() 
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-x-hidden">
       {/* Calendar Header Card */}
       <Card className="p-4 border-border">
         {/* Navigation Bar */}
@@ -147,7 +147,7 @@ export const FinancialCalendar = ({ transactions = [], initialDate = new Date() 
                 onClick={() => setSelectedDate(day)}
                 type="button"
                 className={`
-                  relative min-h-[52px] sm:min-h-[58px] p-1 rounded-2xl flex flex-col items-center justify-between text-center transition-all duration-150
+                  relative min-h-[44px] sm:min-h-[52px] p-0.5 sm:p-1 rounded-xl sm:rounded-2xl flex flex-col items-center justify-between text-center transition-all duration-150
                   ${!isCurMonth ? 'opacity-30' : 'opacity-100'}
                   ${isSelected
                     ? 'border-2 border-accent-income bg-accent-income/10 shadow-sm scale-105 z-10'
@@ -158,7 +158,7 @@ export const FinancialCalendar = ({ transactions = [], initialDate = new Date() 
               >
                 {/* Date Number */}
                 <span
-                  className={`text-xs font-bold leading-tight ${
+                  className={`text-[11px] font-bold leading-tight ${
                     isToday
                       ? 'text-accent-blue'
                       : isSelected
@@ -170,20 +170,20 @@ export const FinancialCalendar = ({ transactions = [], initialDate = new Date() 
                 </span>
 
                 {/* Indicators Dots */}
-                <div className="flex items-center gap-1 my-0.5">
+                <div className="flex items-center gap-0.5 sm:gap-1 my-0.5">
                   {hasIncome && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent-income" title="Pemasukan" />
+                    <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-accent-income" title="Pemasukan" />
                   )}
                   {hasExpense && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent-expense" title="Pengeluaran" />
+                    <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-accent-expense" title="Pengeluaran" />
                   )}
                   {hasSubs && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent-blue" title="Jatuh Tempo Langganan" />
+                    <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-accent-blue" title="Jatuh Tempo Langganan" />
                   )}
                 </div>
 
                 {/* Net Cash Flow text */}
-                <span className="text-[9px] font-medium truncate w-full tabular-nums text-text-muted">
+                <span className="text-[8px] sm:text-[9px] font-medium truncate w-full tabular-nums text-text-muted">
                   {data ? (
                     isPrivacyMode ? (
                       '•••'
@@ -220,9 +220,9 @@ export const FinancialCalendar = ({ transactions = [], initialDate = new Date() 
 
       {/* Selected Date Detail Card */}
       <Card className="p-4 border-border animate-fade-in-up">
-        <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
-          <div>
-            <h3 className="text-xs font-extrabold text-text-primary">
+        <div className="flex items-start justify-between mb-3 pb-2 border-b border-border gap-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xs font-extrabold text-text-primary truncate">
               Aktivitas: {formatDate(selectedDate, 'EEEE, d MMMM yyyy')}
             </h3>
             <p className="text-[11px] text-text-muted mt-0.5">
@@ -233,7 +233,7 @@ export const FinancialCalendar = ({ transactions = [], initialDate = new Date() 
           </div>
           <button
             onClick={() => openTransactionModal(null)}
-            className="p-1.5 rounded-xl bg-accent-income/10 text-accent-income hover:bg-accent-income/20 transition-all flex items-center gap-1 text-xs font-semibold"
+            className="p-1.5 rounded-xl bg-accent-income/10 text-accent-income hover:bg-accent-income/20 transition-all flex items-center gap-1 text-xs font-semibold flex-shrink-0"
           >
             <Plus size={14} />
             <span className="hidden sm:inline">Tambah</span>

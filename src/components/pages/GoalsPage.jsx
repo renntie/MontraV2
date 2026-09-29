@@ -130,7 +130,7 @@ export const GoalsPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-x-hidden">
       {/* Header */}
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
@@ -184,7 +184,7 @@ export const GoalsPage = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 lg:px-6 pb-28 lg:pb-6 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 lg:px-6 pb-28 lg:pb-6 scrollbar-hide">
         {loading ? (
           <div className="flex justify-center py-12"><Spinner size={32} /></div>
         ) : (

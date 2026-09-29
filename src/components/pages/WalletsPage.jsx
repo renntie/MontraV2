@@ -88,7 +88,7 @@ export const WalletsPage = () => {
   const totalBalance = getTotalBalance()
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-x-hidden">
       {/* Header */}
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">

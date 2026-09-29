@@ -56,13 +56,13 @@ export const DashboardPage = () => {
   const balancePositive = summary.balance >= 0
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-x-hidden">
       {/* Mobile Header */}
-      <div className="lg:hidden flex items-center justify-between px-5 pt-5 pb-3">
+      <div className="lg:hidden flex items-center justify-between px-4 pt-4 pb-3">
         {/* Logo kiri */}
         <MontraLogo size="sm" />
         {/* Actions kanan */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {[
             { icon: isPrivacyMode ? EyeOff : Eye, onClick: togglePrivacyMode, spin: false, label: 'privacy', active: isPrivacyMode },
             { icon: RefreshCw, onClick: handleRefresh, spin: spinning, label: 'refresh' },
@@ -74,15 +74,15 @@ export const DashboardPage = () => {
               key={label}
               onClick={onClick}
               aria-label={label}
-              className={`h-9 w-9 rounded-2xl bg-bg-surface border border-border flex items-center justify-center
-                transition-all duration-200 hover:scale-105 active:scale-95
+              className={`h-8 w-8 rounded-xl bg-bg-surface border border-border flex items-center justify-center
+                transition-all duration-200 hover:scale-105 active:scale-95 flex-shrink-0
                 ${active
                   ? 'text-accent-income bg-accent-income/10 border-accent-income/30'
                   : danger
                   ? 'text-text-muted hover:text-accent-expense hover:bg-accent-expense/5'
                   : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'}`}
             >
-              <Icon size={16} className={spin ? 'animate-spin' : ''} />
+              <Icon size={15} className={spin ? 'animate-spin' : ''} />
             </button>
           ))}
         </div>
@@ -130,7 +130,7 @@ export const DashboardPage = () => {
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto px-4 lg:px-6 pb-28 lg:pb-6 space-y-4 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 lg:px-6 pb-28 lg:pb-6 space-y-4 scrollbar-hide">
 
         {/* Month Picker */}
         <div className="flex items-center pt-1 animate-fade-in-down">

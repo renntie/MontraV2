@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import {
   LogOut, Plus, Pencil, Trash2, Download, Shield, Bell,
   ChevronRight, Heart, ExternalLink, Smartphone, Sparkles,
@@ -54,7 +54,7 @@ export const SettingsPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-x-hidden">
       <div className="px-4 lg:px-6 pt-5 lg:pt-6 pb-3 flex-shrink-0">
         <div className="flex items-center gap-3 mb-4">
           <button
