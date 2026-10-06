@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
 import {
   Settings, Sparkles, TrendingUp, TrendingDown, AlertCircle,
-  BarChart3, HeartPulse, Calendar as CalendarIcon, Eye, EyeOff
+  BarChart3, HeartPulse, Calendar as CalendarIcon, Eye, EyeOff, Award
 } from 'lucide-react'
 import { MonthlyBarChart } from '@/components/organisms/MonthlyBarChart'
 import { SpendingDonutChart } from '@/components/organisms/SpendingDonutChart'
 import { FinancialHealthCard } from '@/components/organisms/FinancialHealthCard'
 import { FinancialCalendar } from '@/components/organisms/FinancialCalendar'
+import { AchievementsCard } from '@/components/organisms/AchievementsCard'
 import { MonthPicker } from '@/components/molecules/MonthPicker'
 import { SummaryCard } from '@/components/molecules/SummaryCard'
 import { Card } from '@/components/atoms/Card'
@@ -17,9 +17,10 @@ import { useUIStore } from '@/store/uiStore'
 import { formatCurrency } from '@/utils/formatters'
 
 const ANALYTICS_TABS = [
-  { id: 'overview', label: 'Grafik & Tren',       icon: BarChart3 },
-  { id: 'health',   label: 'Kesehatan 50/30/20',  icon: HeartPulse },
-  { id: 'calendar', label: 'Kalender Arus Kas',   icon: CalendarIcon },
+  { id: 'overview',     label: 'Grafik & Tren',       icon: BarChart3 },
+  { id: 'health',       label: 'Kesehatan 50/30/20',  icon: HeartPulse },
+  { id: 'calendar',     label: 'Kalender Arus Kas',   icon: CalendarIcon },
+  { id: 'achievements', label: 'Badge & Milestone',   icon: Award },
 ]
 
 export const AnalyticsPage = () => {
@@ -109,7 +110,7 @@ export const AnalyticsPage = () => {
         </div>
 
         {/* Month picker only on overview & health */}
-        {activeTab !== 'calendar' && (
+        {activeTab !== 'calendar' && activeTab !== 'achievements' && (
           <MonthPicker value={selectedMonth} onChange={setSelectedMonth} />
         )}
       </div>
@@ -265,6 +266,11 @@ export const AnalyticsPage = () => {
         {/* Tab 3: Financial Calendar */}
         {activeTab === 'calendar' && (
           <FinancialCalendar transactions={transactions} initialDate={selectedMonth} />
+        )}
+
+        {/* Tab 4: Achievements & Badges */}
+        {activeTab === 'achievements' && (
+          <AchievementsCard />
         )}
       </div>
     </div>
