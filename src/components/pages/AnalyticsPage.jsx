@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Settings, Sparkles, TrendingUp, TrendingDown, AlertCircle,
   BarChart3, HeartPulse, Calendar as CalendarIcon, Eye, EyeOff, Award
