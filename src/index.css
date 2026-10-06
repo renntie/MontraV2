@@ -2,6 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-main: #121316;
+  --bg-surface: #1C1E24;
+  --bg-elevated: #252830;
+  --bg-overlay: #2F343F;
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-muted: #64748B;
+  --accent-income: #34D399;
+  --accent-expense: #FB7185;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --glass-bg: rgba(28, 30, 36, 0.85);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="default"] {
+  --bg-main: #121316;
+  --bg-surface: #1C1E24;
+  --bg-elevated: #252830;
+  --bg-overlay: #2F343F;
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-muted: #64748B;
+  --accent-income: #34D399;
+  --accent-expense: #FB7185;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --glass-bg: rgba(28, 30, 36, 0.85);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="midnight"] {
+  --bg-main: #0B1120;
+  --bg-surface: #131D33;
+  --bg-elevated: #1D2B4A;
+  --bg-overlay: #273860;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --accent-income: #38BDF8;
+  --accent-expense: #F87171;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --glass-bg: rgba(19, 29, 51, 0.85);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="charcoal"] {
+  --bg-main: #18181B;
+  --bg-surface: #27272A;
+  --bg-elevated: #333338;
+  --bg-overlay: #3F3F46;
+  --text-primary: #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --accent-income: #A78BFA;
+  --accent-expense: #FB923C;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --glass-bg: rgba(39, 39, 42, 0.85);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+}
+
+/* ── Light Themes ── */
+[data-theme="light"] {
+  --bg-main: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F1F5F9;
+  --bg-overlay: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --accent-income: #059669;
+  --accent-expense: #E11D48;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --scrollbar-thumb: rgba(15, 23, 42, 0.15);
+}
+
+[data-theme="cream"] {
+  --bg-main: #FAF7F2;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F3ECE2;
+  --bg-overlay: #E7DDD0;
+  --text-primary: #292524;
+  --text-secondary: #57534E;
+  --text-muted: #A8A29E;
+  --accent-income: #16A34A;
+  --accent-expense: #DC2626;
+  --border-subtle: rgba(41, 37, 36, 0.08);
+  --border-strong: rgba(41, 37, 36, 0.16);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --scrollbar-thumb: rgba(41, 37, 36, 0.15);
+}
+
+[data-theme="snow"] {
+  --bg-main: #F0F4F8;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #E2E8F0;
+  --bg-overlay: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --accent-income: #2563EB;
+  --accent-expense: #E11D48;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --scrollbar-thumb: rgba(15, 23, 42, 0.15);
+}
+
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -16,12 +129,12 @@
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb, rgba(255, 255, 255, 0.15)); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-strong, rgba(255, 255, 255, 0.3)); }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    scrollbar-color: var(--scrollbar-thumb, rgba(255, 255, 255, 0.15)) transparent;
   }
 
   input[type='number']::-webkit-outer-spin-button,
@@ -33,7 +146,7 @@
 @layer components {
   /* Glassmorphism */
   .glass {
-    background: rgba(26,26,26,0.85);
+    background: var(--glass-bg, rgba(26,26,26,0.85));
     backdrop-filter: blur(24px) saturate(1.4);
     -webkit-backdrop-filter: blur(24px) saturate(1.4);
   }

@@ -8,7 +8,13 @@ import { useAuthStore } from '@/store/authStore'
 export default function App() {
   const { user, loading, initialize } = useAuthStore()
 
-  useEffect(() => { initialize() }, [])
+  useEffect(() => {
+    initialize()
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('montra_theme') || 'default'
+      document.documentElement.setAttribute('data-theme', savedTheme)
+    }
+  }, [])
 
   if (loading) {
     return (

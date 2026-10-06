@@ -5,19 +5,19 @@ export default {
     extend: {
       colors: {
         bg: {
-          DEFAULT: '#121212',
-          surface: '#1A1A1A',
-          elevated: '#242424',
-          overlay: '#2E2E2E',
+          DEFAULT: 'var(--bg-main, #121212)',
+          surface: 'var(--bg-surface, #1A1A1A)',
+          elevated: 'var(--bg-elevated, #242424)',
+          overlay: 'var(--bg-overlay, #2E2E2E)',
         },
         text: {
-          primary: '#F3F4F6',
-          secondary: '#9CA3AF',
-          muted: '#5A5A6A',
+          primary: 'var(--text-primary, #F3F4F6)',
+          secondary: 'var(--text-secondary, #9CA3AF)',
+          muted: 'var(--text-muted, #5A5A6A)',
         },
         accent: {
-          income: '#34D399',
-          expense: '#FB7185',
+          income: 'var(--accent-income, #34D399)',
+          expense: 'var(--accent-expense, #FB7185)',
           'income-dim': 'rgba(52,211,153,0.10)',
           'expense-dim': 'rgba(251,113,133,0.10)',
           blue: '#60A5FA',
@@ -26,8 +26,8 @@ export default {
           sociabuzz: '#7B5CF5',
         },
         border: {
-          DEFAULT: 'rgba(255,255,255,0.07)',
-          strong: 'rgba(255,255,255,0.14)',
+          DEFAULT: 'var(--border-subtle, rgba(255,255,255,0.08))',
+          strong: 'var(--border-strong, rgba(255,255,255,0.16))',
         },
       },
       fontFamily: {

@@ -9,6 +9,7 @@ import { Button } from '@/components/atoms/Button'
 import { Card } from '@/components/atoms/Card'
 import { CategoryIcon } from '@/components/atoms/CategoryIcon'
 import { MontraLogo } from '@/components/atoms/MontraLogo'
+import { ThemeCustomizer } from '@/components/organisms/ThemeCustomizer'
 import { useAuthStore } from '@/store/authStore'
 import { useCategoryStore } from '@/store/categoryStore'
 import { useUIStore } from '@/store/uiStore'
@@ -230,6 +231,8 @@ export const SettingsPage = () => {
           {/* APP */}
           {tab === 'app' && (
             <>
+              {/* Theme Customizer */}
+              <ThemeCustomizer />
               {/* Install PWA Banner */}
               <div className={`relative overflow-hidden rounded-3xl p-5 border transition-all duration-300
                 ${installed
