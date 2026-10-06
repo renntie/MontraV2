@@ -10,6 +10,7 @@ import { SummaryCard } from '@/components/molecules/SummaryCard'
 import { MonthPicker } from '@/components/molecules/MonthPicker'
 import { TransactionItem } from '@/components/molecules/TransactionItem'
 import { SpendingDonutChart } from '@/components/organisms/SpendingDonutChart'
+import { DashboardBudgetAlert } from '@/components/organisms/DashboardBudgetAlert'
 import { Card } from '@/components/atoms/Card'
 import { Spinner } from '@/components/atoms/Spinner'
 import { EmptyState } from '@/components/atoms/EmptyState'
@@ -136,6 +137,9 @@ export const DashboardPage = () => {
         <div className="flex items-center pt-1 animate-fade-in-down">
           <MonthPicker value={selectedMonth} onChange={setSelectedMonth} />
         </div>
+
+        {/* Budget Alert Widget */}
+        <DashboardBudgetAlert selectedMonth={selectedMonth} />
 
         {/* Balance Hero */}
         <Card className="p-5 relative overflow-hidden animate-fade-in-up" style={{ animationDelay: '50ms' }}>
